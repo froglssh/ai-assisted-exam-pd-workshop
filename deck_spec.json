@@ -1,0 +1,722 @@
+{
+  "deck_name": "AI輔助考卷出改解題研習",
+  "language": "Chinese",
+  "goal": "為高中與國中教師提供基於大型語言模型的智慧教學評量工作流研習簡報。",
+  "deck_context": {
+    "source_summary": "介紹 AI 在素養導向評量中的應用，涵蓋出題、改題與解題的智慧化工作流，由淺入深提升教師評量設計與智慧批改能力。",
+    "core_claim": "AI 是最強大的智慧助教，能釋放教師的時間，專注於引導探究與師生互動。",
+    "canonical_terms": [
+      "素養導向評量",
+      "提示詞工程",
+      "智慧批改",
+      "解題知識庫",
+      "AI 代理人"
+    ]
+  },
+  "selected_image_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+  "max_concurrent_slides": 6,
+  "sample_generation_method": {
+    "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+    "tool_name": "scripts/image_gen.py",
+    "mode": "generate",
+    "prompt_source": "Conversation prompt",
+    "size": "2048x1152",
+    "quality": "medium",
+    "approved_sample_path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+    "input_context_preparation": "inspect style references before generation; pass strict input assets with edit --image only when a slide job lists input_images",
+    "handoff_rule": "Subagents must use this same backend/tool/config; use generate for new slides unless the assigned job has strict input_images or is a repair."
+  },
+  "style": {
+    "name": "清爽專業風 (A風格)",
+    "visual_direction": "clean professional presentation style with light gray background, clean cards, and clear typography",
+    "color_palette": "light gray background, deep blue main text and headers, vibrant teal accent colors",
+    "typography": "large clean sans-serif Chinese headings, highly legible body text with clear hierarchical alignment",
+    "texture_and_finish": "flat editorial look, clean cards, balanced spacing"
+  },
+  "approved_style_reference": {
+    "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+    "role": "approved sample slide style reference",
+    "fidelity": "match style only; do not copy layout or content"
+  },
+  "slides": [
+    {
+      "number": 1,
+      "title": "AI助教時代的教學評量革命：出題、改題與解題的智慧工作流",
+      "role": "cover",
+      "intent": "研習封面頁，介紹講者與主題",
+      "key_points": [
+        "AI 如何翻轉教師的教學評量日常",
+        "從自動化出題到手寫題智慧批改",
+        "大考趨勢與 AI 解題知識庫"
+      ],
+      "layout": {
+        "composition": "large title on the left, supporting visual illustration on the right"
+      },
+      "visual_elements": {
+        "main_visual": "technology-enhanced learning icon, minimalist design"
+      },
+      "constraints": [
+        "Keep text clean and uncluttered",
+        "Background must be very light gray"
+      ]
+    },
+    {
+      "number": 2,
+      "title": "研習核心：AI 評量工作流的三大支柱",
+      "role": "agenda",
+      "intent": "介紹本次研習的主要大綱與結構",
+      "key_points": [
+        "01 評量變革學理基礎",
+        "02 AI 輔助出題實務",
+        "03 AI 輔助改題與智慧批改",
+        "04 AI 輔助解題與自動化代理"
+      ],
+      "layout": {
+        "composition": "four parallel rectangular cards representing agenda sections"
+      },
+      "visual_elements": {
+        "main_visual": "four cards with gradient color headers in deep blue and teal"
+      },
+      "constraints": [
+        "Use a highly structured layout",
+        "Number each agenda section clearly"
+      ]
+    },
+    {
+      "number": 3,
+      "title": "108課綱下，教師的「評量深淵」",
+      "role": "concept explanation",
+      "intent": "說明目前評量上面臨的痛點與挑戰",
+      "key_points": [
+        "素養題文字多、情境多、圖表多，導致命題時間倍增",
+        "手寫非選題批改極其耗時，教師負擔沉重",
+        "缺乏時間提供個別化學生答題回饋",
+        "大考趨勢與題型規格變動快速"
+      ],
+      "layout": {
+        "composition": "three pain-point text cards on the left, supporting stress illustration on the right"
+      },
+      "visual_elements": {
+        "main_visual": "graphic icon representing document workload and time pressure"
+      },
+      "constraints": [
+        "Clearly align pain points",
+        "Contrast the text cards with the background"
+      ]
+    },
+    {
+      "number": 4,
+      "title": "教師與 AI 協同的四個應用層次",
+      "role": "process",
+      "intent": "展示教師掌握 AI 評量技能的階梯式學習地圖",
+      "key_points": [
+        "Level 1 快速教材出題：Kahoot! / Quizizz AI 快速變題庫",
+        "Level 2 提示詞工程與舊題改造：Before / After 情境化改造",
+        "Level 3 新題設計與實驗/影音情境化命題：課外素材提取",
+        "Level 4 視覺多模態出題與 AI 代理人：一鍵自動化規劃與排版"
+      ],
+      "layout": {
+        "composition": "four-step ascending stairs layout representing the levels"
+      },
+      "visual_elements": {
+        "main_visual": "stair steps with numeric labels Level 1 to 4 and key phrases"
+      },
+      "constraints": [
+        "Visually represent a progression from bottom-left to top-right"
+      ]
+    },
+    {
+      "number": 5,
+      "title": "素養試題的四大靈魂要素",
+      "role": "concept explanation",
+      "intent": "介紹素養命題理論基礎的四個維度",
+      "key_points": [
+        "情境脈絡 (Context)：解決假素養，情境必須是解題必要條件",
+        "整合運用 (Integration)：跨章節、學科概念的交叉整合",
+        "能力表現 (Performance)：用具體動詞（分析、推論、評估）引導表現",
+        "態度與價值 (Values)：探究與思辨中的倫理或決策價值"
+      ],
+      "layout": {
+        "composition": "four-quadrant grid intersecting layout"
+      },
+      "visual_elements": {
+        "main_visual": "a central 2x2 grid representing the four core elements"
+      },
+      "constraints": [
+        "Balanced spacing between quadrants",
+        "Highlight each title with teal color"
+      ]
+    },
+    {
+      "number": 6,
+      "title": "國中教育會考：三多一沒有",
+      "role": "concept explanation",
+      "intent": "剖析會考命題的特色與格局",
+      "key_points": [
+        "文字多、圖表多、情境多、沒有複雜計算的「三多一沒有」原則",
+        "圖表題占比極高：社會科超過五成，自然科達七至八成",
+        "跨科整合與雙文本對讀已成常態",
+        "高容錯率下頂端鑑別度仍極高，須設計足夠的難題關卡"
+      ],
+      "layout": {
+        "composition": "large text accent block on the left, detailed table/list on the right"
+      },
+      "visual_elements": {
+        "main_visual": "text indicator '三多一沒有' in extra large font size"
+      },
+      "constraints": [
+        "Make the text '三多一沒有' highly prominent"
+      ]
+    },
+    {
+      "number": 7,
+      "title": "大學學測：學術情境化與混合題型",
+      "role": "concept explanation",
+      "intent": "剖析學測命題的最新趨勢與結構",
+      "key_points": [
+        "總閱讀量達 13,000 字，須具備高效的證據導向閱讀能力",
+        "引入「混合題型」：同題組包含選擇與非選擇題",
+        "學術情境化趨勢：引入科普文、學術論文摘要、史料批判",
+        "鑑別機制：多文本邏輯辯證、語碼轉換、空間推理"
+      ],
+      "layout": {
+        "composition": "diagram showing hybrid question structure on the left, trend details on the right"
+      },
+      "visual_elements": {
+        "main_visual": "flow diagram: Context -> Q1 (MCQ) -> Q2 (MCQ) -> Q3 (Short Answer)"
+      },
+      "constraints": [
+        "Render the flow chart clearly",
+        "Align components nicely"
+      ]
+    },
+    {
+      "number": 8,
+      "title": "分科測驗：鷹架式題組與第一性原理",
+      "role": "concept explanation",
+      "intent": "剖析分科測驗的高階命題挑戰",
+      "key_points": [
+        "鷹架式評量：由淺入深的漸進性子題設計",
+        "引入陌生現象或舊課綱內容，考核回歸第一性原理能力",
+        "探究實作實驗題不考標準答案，考科學家的思辨過程",
+        "非選擇題配分大增，要求精確使用學術語言論述"
+      ],
+      "layout": {
+        "composition": "pyramid structure representing the cognitive scaffold stages"
+      },
+      "visual_elements": {
+        "main_visual": "a three-layer pyramid representing: 1. Concept recall, 2. Variable analysis, 3. Critical evaluation"
+      },
+      "constraints": [
+        "Keep pyramid labels clean and readable"
+      ]
+    },
+    {
+      "number": 9,
+      "title": "命題計畫：認知層次與難度配置",
+      "role": "data evidence",
+      "intent": "指引教師如何科學地分配考卷的題型與難度",
+      "key_points": [
+        "布魯姆認知層次 C1-C6 對照，素養題主力在 C3-C4",
+        "避免僅考 C1-C2 記憶性定義，著重 C4 分析與 C5 評鑑",
+        "針對不同考試（段考、會考、學測）的易中難比例配置建議",
+        "雙向細目表對齊：確保評量覆蓋面與核心概念相符"
+      ],
+      "layout": {
+        "composition": "a multi-row table showing difficulty configurations for school and national exams"
+      },
+      "visual_elements": {
+        "main_visual": "structured grid table for exam specification"
+      },
+      "constraints": [
+        "Grid lines must be clean",
+        "Use a neat corporate table layout"
+      ]
+    },
+    {
+      "number": 10,
+      "title": "一鍵生成：Kahoot! AI 與 Quizizz AI",
+      "role": "comparison",
+      "intent": "介紹 Level 1 的兩大快速互動出題工具",
+      "key_points": [
+        "Kahoot! AI：直接上傳講義 PDF，AI 自動分析並一鍵產出即時評量互動遊戲",
+        "Quizizz AI (Wayground)：支援網頁連結、YouTube 教學影片出題，拓寬素材來源",
+        "學生端回饋：以遊戲化界面即時了解學習狀況，提升課堂專注度"
+      ],
+      "layout": {
+        "composition": "two comparative columns displaying Kahoot! AI and Quizizz AI workflows"
+      },
+      "visual_elements": {
+        "main_visual": "workflow step icons for each tool, showing PDF/URL import to quiz output"
+      },
+      "constraints": [
+        "Keep both columns equal in width",
+        "Use clear divider lines"
+      ]
+    },
+    {
+      "number": 11,
+      "title": "智慧診斷：Edcafe AI 與個人化學習回饋",
+      "role": "concept explanation",
+      "intent": "介紹 Edcafe AI 的個人化診斷性回饋特色",
+      "key_points": [
+        "不只提供測驗，更在學生回答後提供 AI Feedback",
+        "針對學生的回答給予個人化建議與引導，幫助釐清盲點",
+        "比起只給予標準答案，AI Feedback 能引導學生進行反思",
+        "提供教師完整的學習數據，快速掌握班級易錯概念"
+      ],
+      "layout": {
+        "composition": "mockup screen interface showing personalized feedback popup"
+      },
+      "visual_elements": {
+        "main_visual": "ui window card with highlighted text box labeled 'AI Feedback'"
+      },
+      "constraints": [
+        "Maintain flat editorial web design look"
+      ]
+    },
+    {
+      "number": 12,
+      "title": "如何與 AI 對話？出題提示詞的黃金結構",
+      "role": "process",
+      "intent": "提供出題提示詞的核心撰寫結構與模板",
+      "key_points": [
+        "角色設定：我是台灣高中生物老師，請以高中學生程度...",
+        "任務要求：針對指定單元，請出多選題、閱讀題組",
+        "格式指定：明確規定選項數量、正確答案、詳解格式",
+        "目標與限制：不要出現無效的干擾選項，確保情境非裝飾性"
+      ],
+      "layout": {
+        "composition": "four interconnected circles or gears representing the prompt structure"
+      },
+      "visual_elements": {
+        "main_visual": "four-step flow diagram: 1. Role, 2. Task, 3. Format, 4. Constraints"
+      },
+      "constraints": [
+        "Align the steps horizontally or clockwise"
+      ]
+    },
+    {
+      "number": 13,
+      "title": "影音命題：鹽沼天牛生存機制測驗生成",
+      "role": "process",
+      "intent": "展示如何以 YouTube 影片逐字稿設計素養考題的案例",
+      "key_points": [
+        "選擇課外有趣的科學影片（如北美鹽沼天牛）",
+        "AI 擷取 YouTube 影片逐字稿並進行摘要整理",
+        "生成結構化的閱讀測驗題目，結合生物學基礎知識",
+        "教師不再需要辛辛苦手動打字，快速將新資訊轉為題目"
+      ],
+      "layout": {
+        "composition": "horizontal workflow line with three core checkpoints"
+      },
+      "visual_elements": {
+        "main_visual": "icons representing: YouTube Play -> AI Processing -> Completed Exam paper"
+      },
+      "constraints": [
+        "Ensure clean arrow connection between icons"
+      ]
+    },
+    {
+      "number": 14,
+      "title": "實驗命題：將課本實驗轉為探究題組",
+      "role": "concept explanation",
+      "intent": "說明如何利用實驗步驟產生實作導向考題",
+      "key_points": [
+        "將課本實驗步驟（如有機物檢測、酵素實驗）輸入 AI",
+        "AI 能讀懂實驗的操縱變因、控制變因與觀測指標",
+        "產生考查實驗設計缺陷、變因控制或實驗優化的探究題組",
+        "出出的題目貼近學生實際操作，適合作為課前預習或課後複習"
+      ],
+      "layout": {
+        "composition": "experiment diagram card on the left, generated question list on the right"
+      },
+      "visual_elements": {
+        "main_visual": "conceptual beaker icon and data table matching the question layout"
+      },
+      "constraints": [
+        "Organize content clearly to convey the workflow"
+      ]
+    },
+    {
+      "number": 15,
+      "title": "視覺出題：讓圖表、構造圖自動出題",
+      "role": "concept explanation",
+      "intent": "介紹多模態視覺 AI 在圖表題命題上的應用",
+      "key_points": [
+        "使用 Gemini 等多模態視覺 AI 的圖像識別能力",
+        "直接上傳課本構造圖（如心臟瓣膜與心房）、地圖或統計圖表",
+        "AI 識別圖中標示（如構造 A、B、C）並針對特定結構出題",
+        "解決過去圖表題需要手動描圖或辛苦排版的命題痛點"
+      ],
+      "layout": {
+        "composition": "diagram visualization in the center, surrounding question boxes connected by lines"
+      },
+      "visual_elements": {
+        "main_visual": "heart structure diagram with letters A, B, C pointing to quiz boxes"
+      },
+      "constraints": [
+        "Clean diagram layout, lines pointing to questions must align perfectly"
+      ]
+    },
+    {
+      "number": 16,
+      "title": "出題工具箱：各大 AI 模型能力評比",
+      "role": "data evidence",
+      "intent": "比較不同大型語言模型在命題上的優缺點",
+      "key_points": [
+        "ChatGPT：適合常規、結構化命題，指令執行力強",
+        "Claude：長文本、跨文本對讀與嚴謹命題的第一選擇",
+        "Gemini：具備極佳視覺能力，圖表題與非選批改表現優異",
+        "Perplexity / Felo Search：即時連網，適合時事與最新科學研究出題"
+      ],
+      "layout": {
+        "composition": "comparison matrix table comparing the four models across different dimensions"
+      },
+      "visual_elements": {
+        "main_visual": "comparison grid with checkmarks or star ratings"
+      },
+      "constraints": [
+        "Grid headers must be distinct",
+        "High contrast table styling"
+      ]
+    },
+    {
+      "number": 17,
+      "title": "拒絕瑕疵：如何設計有效的誘答選項",
+      "role": "concept explanation",
+      "intent": "指導教師如何避免試題設計中的常見瑕疵",
+      "key_points": [
+        "避免長度線索：正確答案不應明顯長於干擾選項",
+        "似真性設計：錯誤選項應對應學生的真實迷思概念或計算錯誤",
+        "避免無效選項：0% 選擇率的選項無法診斷學生的問題",
+        "隨機分散正確答案位置，預防數字排列暗示"
+      ],
+      "layout": {
+        "composition": "split columns showing 'Common Flaw' on the left and 'AI Correction Strategy' on the right"
+      },
+      "visual_elements": {
+        "main_visual": "cross and checkmark icons for contrast"
+      },
+      "constraints": [
+        "Keep text alignment stable",
+        "Good spacing between columns"
+      ]
+    },
+    {
+      "number": 18,
+      "title": "傳統題目改造：菌根題目升級實踐",
+      "role": "comparison",
+      "intent": "展示菌根題目的Before/After改造案例（核准樣張）",
+      "key_points": [
+        "Before (傳統考題)：偏向死記「菌根真菌幫助植物吸收磷」等事實",
+        "After (素養考題)：提供植物與真菌共生關係的研究數據或對照圖表",
+        "評量目標轉化：從單純的記憶檢索，升級為科學推理與數據分析能力"
+      ],
+      "layout": {
+        "composition": "before card on the left, after card on the right, pointing arrow in the center"
+      },
+      "visual_elements": {
+        "main_visual": "arrows and highlighted question blocks with a light data graph"
+      },
+      "constraints": [
+        "Ensure style matches approved slide_18.png exactly"
+      ],
+      "sample_approved": true
+    },
+    {
+      "number": 19,
+      "title": "題型轉換：將選擇題變為手寫問答題",
+      "role": "comparison",
+      "intent": "展示將選擇題改造為手寫申論題的案例與好處",
+      "key_points": [
+        "去除選項暗示，要求學生寫出完整因果邏輯關係",
+        "更能測出學生的真實理解，而非靠消去法猜中答案",
+        "設計關鍵詞（如營養吸收、碳源交換）作為評分對照",
+        "有助於訓練學生的表達能力與科學論述邏輯"
+      ],
+      "layout": {
+        "composition": "MCQ crossed out on the left, short answer prompt on the right"
+      },
+      "visual_elements": {
+        "main_visual": "strikethrough icon over MCQ choices, clean empty lines for hand-written response"
+      },
+      "constraints": [
+        "Highlight the empty hand-written lines with teal highlighting color"
+      ]
+    },
+    {
+      "number": 20,
+      "title": "評改標準化：階段式 Rubrics 設計",
+      "role": "concept explanation",
+      "intent": "說明如何為非選擇題設計客觀、階段式的評分規準",
+      "key_points": [
+        "傳統非選題批改常流於主觀；AI 批改需要精確的給分規準",
+        "將答案拆解為：概念識別、推論過程、結論表達等階梯",
+        "設定每一階梯的給分條件，確保批改一致性",
+        "學生可依據 Rubrics 清楚知道自己失分的環節"
+      ],
+      "layout": {
+        "composition": "3-step ladder diagram representing grading levels"
+      },
+      "visual_elements": {
+        "main_visual": "step blocks: 1. Concept recall (2 pts), 2. Reasoning (2 pts), 3. Conclusion (1 pt)"
+      },
+      "constraints": [
+        "Keep ladder text compact and centered"
+      ]
+    },
+    {
+      "number": 21,
+      "title": "手寫考卷批改：AI 視覺評分實務",
+      "role": "case study",
+      "intent": "展示 AI 對實體手寫考卷進行辨識與批改的流程",
+      "key_points": [
+        "拍照上傳學生手寫考卷照片（包含文字與算式）",
+        "AI 載入評分原則與 Rubrics，進行圖像文字識別與理解",
+        "自動判斷學生答案並給分，回傳得分細項",
+        "產出個別化回饋，指出學生的概念漏洞與訂正建議"
+      ],
+      "layout": {
+        "composition": "student handwritten paper on the left, AI grading report block on the right"
+      },
+      "visual_elements": {
+        "main_visual": "annotated document card showing green and red corrections"
+      },
+      "constraints": [
+        "Simulate red ink annotations on the mockup paper"
+      ]
+    },
+    {
+      "number": 22,
+      "title": "國寫作文批改：AI 等級評閱實踐",
+      "role": "case study",
+      "intent": "展示 AI 批改高中學測國寫作文的維度與效果",
+      "key_points": [
+        "輸入國文寫作（國寫）原卷 PDF 影像檔案",
+        "依大考中心評分原則（內容、結構、表達）進行三維度評閱",
+        "提供精確的等第（如A+、A、B+）並生成詳細分析評語",
+        "自動檢出邏輯矛盾、換位思考不足，給予誠懇有溫度的指引"
+      ],
+      "layout": {
+        "composition": "composition page on the left, 3D evaluation radar chart on the right"
+      },
+      "visual_elements": {
+        "main_visual": "radar chart representing Content, Structure, and Expression scores"
+      },
+      "constraints": [
+        "Radar chart must look neat and mathematical"
+      ]
+    },
+    {
+      "number": 23,
+      "title": "Gradescope：師生評量的智慧助手",
+      "role": "concept explanation",
+      "intent": "介紹 Gradescope 批改軟體的 AI 分類與動態 Rubrics 特色",
+      "key_points": [
+        "考卷智慧分類：將學生相同手寫答案歸為一組，一鍵批改全班",
+        "動態調整評分規準：隨時修改 Rubrics，所有考卷自動重新計分",
+        "詳盡的答題數據分析：即時產出每題答對率與全班錯題分佈",
+        "大幅縮減教師閱卷時間，提升非選題評分公正性"
+      ],
+      "layout": {
+        "composition": "horizontal workflow arrows showing student scan -> AI grouping -> batch grade"
+      },
+      "visual_elements": {
+        "main_visual": "grouping card icons showing similar answers being stacked together"
+      },
+      "constraints": [
+        "Clearly show the workflow sequence"
+      ]
+    },
+    {
+      "number": 24,
+      "title": "一鍵解析：考卷詳解與概念庫建立",
+      "role": "process",
+      "intent": "說明如何一鍵生成詳解與班級複習指引",
+      "key_points": [
+        "將試卷與標準答案輸入 AI，一鍵產出每題的詳細解析",
+        "自動分析整份考卷考查的核心概念與知識點分佈",
+        "快速產出給學生訂正考卷用的「班級考前重點複習指引」",
+        "幫助教師擺脫手動打詳解的繁重文書工作"
+      ],
+      "layout": {
+        "composition": "flow chart showing input exam to generated Word and PNG outputs"
+      },
+      "visual_elements": {
+        "main_visual": "process arrows with file type icons (.pdf, .docx, .png)"
+      },
+      "constraints": [
+        "Keep file icons clean and styled in professional theme"
+      ]
+    },
+    {
+      "number": 25,
+      "title": "趨勢透視：115學測自然科深度分析",
+      "role": "data evidence",
+      "intent": "以115學測自然科解析為例展示大考趨勢分析成果",
+      "key_points": [
+        "分析 115 年學測自然科（生物、物理、化學、地科）的難度配置",
+        "自動提煉高頻考查核心概念與探究實作命題趨勢",
+        "發現自然科高難度題型占比，解構「寫不完」題型的應試策略",
+        "作為教師調整學期教學進度與模擬考命題的重要參考"
+      ],
+      "layout": {
+        "composition": "pie chart showing exam section weightage, key bullet list on the right"
+      },
+      "visual_elements": {
+        "main_visual": "pie chart displaying biology, chemistry, physics, earth science distribution"
+      },
+      "constraints": [
+        "Use matching blue and teal gradient colors for the pie chart sections"
+      ]
+    },
+    {
+      "number": 26,
+      "title": "NotebookLM：建立班級專屬解題 Bot",
+      "role": "architecture",
+      "intent": "介紹如何使用 NotebookLM 打造學生專用的解題 AI 助教",
+      "key_points": [
+        "將段考試卷、模擬考題、大考詳解 PDF 匯入 NotebookLM 筆記本",
+        "來源定向：解答只會依據上傳的考卷內容，避免 AI 胡言亂語",
+        "學生可隨時提問，AI 解題助教提供即時互動式詳解",
+        "可自動生成音訊簡報（Podcast），將生硬試題轉為生動音頻"
+      ],
+      "layout": {
+        "composition": "system architecture showing folders on left, central engine, user dialogue on right"
+      },
+      "visual_elements": {
+        "main_visual": "folder icon -> NotebookLM database -> chat window mockup"
+      },
+      "constraints": [
+        "Keep arrows straight and clean"
+      ]
+    },
+    {
+      "number": 27,
+      "title": "客製化 Bot：GPTs 專案與 Gemini Gem 設定",
+      "role": "concept explanation",
+      "intent": "指導教師如何建立常駐的個人命題/改題機器人",
+      "key_points": [
+        "ChatGPT GPTs：上傳教師專屬題庫與講義，定義出題規則與語氣",
+        "Gemini Gem：設定命題顧問角色，與 Google 雲端硬碟同步",
+        "實現日常考卷命題與修改的自動化，一鍵呼叫專屬助理",
+        "透過系統提示詞（System Prompts）鎖定大考命題規格"
+      ],
+      "layout": {
+        "composition": "side-by-side card layouts for GPTs and Gems interface setup"
+      },
+      "visual_elements": {
+        "main_visual": "ui screenshots simplified as neat vector wireframes"
+      },
+      "constraints": [
+        "Avoid cluttering the screenshots, keep it symbolic"
+      ]
+    },
+    {
+      "number": 28,
+      "title": "AI 代理人：一鍵生成完整試卷與解答",
+      "role": "process",
+      "intent": "介紹一鍵完成規劃、出題、排版的自動化代理人工作流",
+      "key_points": [
+        "教師下達單一指令，AI 代理人負責完成規劃、出題與排版",
+        "整合 MCP 命題工具，能呼叫外部知識庫進行題目挑選",
+        "自動處理選擇題、多選題、閱讀題組的配分與排版",
+        "最終一鍵輸出「學生版試卷 PDF」與「教師版詳解 Docx」"
+      ],
+      "layout": {
+        "composition": "step-by-step progress line indicating agent decision loop"
+      },
+      "visual_elements": {
+        "main_visual": "horizontal progress indicator with 4 major checkpoints"
+      },
+      "constraints": [
+        "Clean typography, easy-to-follow sequence"
+      ]
+    },
+    {
+      "number": 29,
+      "title": "自動化成果：光合作用與呼吸作用考卷",
+      "role": "case study",
+      "intent": "展示 AI Agent 一鍵生成的試卷與評分規準實物成果",
+      "key_points": [
+        "展示由 AI Agent 產出的試卷實物結構與難度配置",
+        "試卷包含：單選 20 題、多選 15 題、閱讀測驗 3 題、非選擇題",
+        "排版完全符合大考中心試卷格式，並附帶精準評分規準 (Rubrics)",
+        "示範如何透過指令進行考卷的快速微調與個別題目替換"
+      ],
+      "layout": {
+        "composition": "exam paper preview sheet, behind which lies the agent scripting code"
+      },
+      "visual_elements": {
+        "main_visual": "mockup document overlap layout with code overlay"
+      },
+      "constraints": [
+        "Keep text of document preview realistic, avoid blurry placeholders"
+      ]
+    },
+    {
+      "number": 30,
+      "title": "AI 與教師的協同進化",
+      "role": "summary",
+      "intent": "總結教師與 AI 助教的合理分工與定位哲學",
+      "key_points": [
+        "AI 助教的定位：處理重複、繁重、結構化的庶務（出題排版、初步改卷）",
+        "教師的靈魂價值：引導探究、個別輔導、情感連結、教學創新與引導",
+        "AI 賦能教學：AI 讓教師有更多時間回歸課堂，專注於人的陪伴",
+        "教學評量的寧靜革命：用科技縮短文書工作，用愛帶領學生成長"
+      ],
+      "layout": {
+        "composition": "centered balance scale showing equal weights on both sides"
+      },
+      "visual_elements": {
+        "main_visual": "a classic scale balancing 'AI (Doc Work)' and 'Teacher (Human Care)'"
+      },
+      "constraints": [
+        "Keep the scale icon central and symmetrical"
+      ]
+    },
+    {
+      "number": 31,
+      "title": "您的 AI 落地行動方案：從明天開始",
+      "role": "timeline",
+      "intent": "為教師提供可落地的研習後行動指南",
+      "key_points": [
+        "第一週 (嘗試)：試用 Kahoot! / Quizizz AI 進行課堂快速複習小考出題",
+        "第一個月 (建置)：設定一個專屬 Gemini Gem 出改題 Bot，優化工作流",
+        "本學期 (深耕)：用 NotebookLM 將段考考卷與詳解打造成解題 AI 助教",
+        "教師專業社群：成立 AI 命題社群，共享提示詞與題目資源"
+      ],
+      "layout": {
+        "composition": "horizontal timeline checkpoints indicating weekly, monthly, and semester targets"
+      },
+      "visual_elements": {
+        "main_visual": "horizontal line with chronological bubble nodes"
+      },
+      "constraints": [
+        "Use contrasting teal node markers for emphasizing progress"
+      ]
+    },
+    {
+      "number": 32,
+      "title": "用 AI 賦能教學，釋放更多創造力！",
+      "role": "summary",
+      "intent": "研習封底謝幕與 Q&A 頁面",
+      "key_points": [
+        "謝謝聆聽！歡迎提問與交流",
+        "本研習簡報、所有提示詞工具與資源連結共享 QR Code",
+        "主辦單位：LM 工作室 ＆ 麗山高中 林獻升老師",
+        "期待與各位老師共同開啟 AI 助教評量的新紀元"
+      ],
+      "layout": {
+        "composition": "centered thank you message with supporting QR code box"
+      },
+      "visual_elements": {
+        "main_visual": "vector QR code icon on the right, large elegant '謝謝聆聽' on the left"
+      },
+      "constraints": [
+        "Keep the visual highly elegant and spacious"
+      ]
+    }
+  ]
+}

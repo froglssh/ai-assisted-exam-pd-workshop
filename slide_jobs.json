@@ -1,0 +1,1346 @@
+{
+  "run_status": "slides_recorded",
+  "deck_name": "AI輔助考卷出改解題研習",
+  "selected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+  "sample_generation_method": {
+    "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+    "tool_name": "scripts/image_gen.py",
+    "mode": "generate",
+    "prompt_source": "Conversation prompt",
+    "size": "2048x1152",
+    "quality": "medium",
+    "approved_sample_path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+    "input_context_preparation": "inspect style references before generation; pass strict input assets with edit --image only when a slide job lists input_images",
+    "handoff_rule": "Subagents must use this same backend/tool/config; use generate for new slides unless the assigned job has strict input_images or is a repair."
+  },
+  "max_concurrent_slides": 6,
+  "slides": [
+    {
+      "slide_id": "slide_01",
+      "number": 1,
+      "title": "AI助教時代的教學評量革命：出題、改題與解題的智慧工作流",
+      "job": "prompts/slide_01.json",
+      "out": "origin_image/slide_01.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_01",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_01.json",
+        "prompt_sha256": "98f638d448b1cb670e488fabfc773946aebf5ade808f1f729a77bf36d5600292",
+        "dispatched_at": "2026-06-24T15:26:50Z"
+      },
+      "result": {
+        "agent_id": "worker_01",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_01_candidate.png",
+        "selected_source_sha256": "f37b5e3daa76b6ffe67b0a153b8af4f451660fe50b53b4909d3ed004739118d5",
+        "final_image": "origin_image/slide_01.png",
+        "final_image_sha256": "f37b5e3daa76b6ffe67b0a153b8af4f451660fe50b53b4909d3ed004739118d5",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; style matches the approved sample.",
+        "recorded_at": "2026-06-24T15:28:19Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_02",
+      "number": 2,
+      "title": "研習核心：AI 評量工作流的三大支柱",
+      "job": "prompts/slide_02.json",
+      "out": "origin_image/slide_02.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_02",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_02.json",
+        "prompt_sha256": "52e8f685d04fa9af4420a79c275e9d1f130aa21d28a616dbde15b245646455f7",
+        "dispatched_at": "2026-06-24T15:26:50Z"
+      },
+      "result": {
+        "agent_id": "worker_02",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_02_candidate.png",
+        "selected_source_sha256": "e48cc2b2941ecb1e5a6b939bc40dc80ee60f3297c8c1486c1c690f03cf63d630",
+        "final_image": "origin_image/slide_02.png",
+        "final_image_sha256": "e48cc2b2941ecb1e5a6b939bc40dc80ee60f3297c8c1486c1c690f03cf63d630",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; cards match the style guidelines.",
+        "recorded_at": "2026-06-24T15:28:26Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_03",
+      "number": 3,
+      "title": "108課綱下，教師的「評量深淵」",
+      "job": "prompts/slide_03.json",
+      "out": "origin_image/slide_03.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_03",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_03.json",
+        "prompt_sha256": "7140811421e376dc4be286cffed70346bd7dc91799a623fa33567860c950f462",
+        "dispatched_at": "2026-06-24T15:26:50Z"
+      },
+      "result": {
+        "agent_id": "worker_03",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_03_candidate.png",
+        "selected_source_sha256": "d87b6feb23db7dc21dcdb1e6ca10fe275cde2388a6e66488932122a4e9be97d7",
+        "final_image": "origin_image/slide_03.png",
+        "final_image_sha256": "d87b6feb23db7dc21dcdb1e6ca10fe275cde2388a6e66488932122a4e9be97d7",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; workload visualization is clean.",
+        "recorded_at": "2026-06-24T15:28:23Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_04",
+      "number": 4,
+      "title": "教師與 AI 協同的四個應用層次",
+      "job": "prompts/slide_04.json",
+      "out": "origin_image/slide_04.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_04",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_04.json",
+        "prompt_sha256": "a7e8b70ae8f480044ab12220b23c786d75683fbb59263e747e20ac3ffebdbed4",
+        "dispatched_at": "2026-06-24T15:26:50Z"
+      },
+      "result": {
+        "agent_id": "worker_04",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_04_candidate.png",
+        "selected_source_sha256": "d168d6ecc8703b63010166f971d1fc0e2b034870cc11296c11255f38dadcaf3c",
+        "final_image": "origin_image/slide_04.png",
+        "final_image_sha256": "d168d6ecc8703b63010166f971d1fc0e2b034870cc11296c11255f38dadcaf3c",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; staircase layout clearly demonstrates levels.",
+        "recorded_at": "2026-06-24T15:28:19Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_05",
+      "number": 5,
+      "title": "素養試題的四大靈魂要素",
+      "job": "prompts/slide_05.json",
+      "out": "origin_image/slide_05.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_05",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_05.json",
+        "prompt_sha256": "8fdd06b5986d388af6ac0f69737df5434f5ad179dfbce8047bd5a5953f7708c0",
+        "dispatched_at": "2026-06-24T15:26:51Z"
+      },
+      "result": {
+        "agent_id": "worker_05",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_05_candidate.png",
+        "selected_source_sha256": "6eb41e351d36c694ae6a3161e5e8b9556abd1052d74f6ace073722fea58df3dd",
+        "final_image": "origin_image/slide_05.png",
+        "final_image_sha256": "6eb41e351d36c694ae6a3161e5e8b9556abd1052d74f6ace073722fea58df3dd",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; 2x2 grid layout is very professional.",
+        "recorded_at": "2026-06-24T15:28:23Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_06",
+      "number": 6,
+      "title": "國中教育會考：三多一沒有",
+      "job": "prompts/slide_06.json",
+      "out": "origin_image/slide_06.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_06",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_06.json",
+        "prompt_sha256": "59cff9a7ddeafacb46fb24e745917824ec77216000a7e5c562863cbbd864074c",
+        "dispatched_at": "2026-06-24T15:26:51Z"
+      },
+      "result": {
+        "agent_id": "worker_06",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_06_candidate.png",
+        "selected_source_sha256": "1c13a19d70b9c7baa92ce13c25432d84b7a5f07b83d01d160204169fffeb7f22",
+        "final_image": "origin_image/slide_06.png",
+        "final_image_sha256": "1c13a19d70b9c7baa92ce13c25432d84b7a5f07b83d01d160204169fffeb7f22",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; layout is professional and well-formatted.",
+        "recorded_at": "2026-06-24T15:28:19Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_07",
+      "number": 7,
+      "title": "大學學測：學術情境化與混合題型",
+      "job": "prompts/slide_07.json",
+      "out": "origin_image/slide_07.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_07",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_07.json",
+        "prompt_sha256": "2194d5de6a35c52b47d331ab9f6b9162ae35c4b9c2f350c145c6d647cbfec574",
+        "dispatched_at": "2026-06-24T15:28:19Z"
+      },
+      "result": {
+        "agent_id": "worker_07",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_07_candidate.png",
+        "selected_source_sha256": "c0f5497a68c36bf9172ce5f45b151afb1f54d6d6e030ed7f05ec35675fa7d69e",
+        "final_image": "origin_image/slide_07.png",
+        "final_image_sha256": "c0f5497a68c36bf9172ce5f45b151afb1f54d6d6e030ed7f05ec35675fa7d69e",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; cards match visual style.",
+        "recorded_at": "2026-06-24T15:30:02Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_08",
+      "number": 8,
+      "title": "分科測驗：鷹架式題組與第一性原理",
+      "job": "prompts/slide_08.json",
+      "out": "origin_image/slide_08.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_08",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_08.json",
+        "prompt_sha256": "bd8782051d73316dec5570d25a2be112fdb334a620688a518b21080fb620244b",
+        "dispatched_at": "2026-06-24T15:28:19Z"
+      },
+      "result": {
+        "agent_id": "worker_08",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_08_candidate.png",
+        "selected_source_sha256": "42b5135c561c8f2293dfe59da41815a58a1ac4ab1b05ab0f4f8f67412d1a93af",
+        "final_image": "origin_image/slide_08.png",
+        "final_image_sha256": "42b5135c561c8f2293dfe59da41815a58a1ac4ab1b05ab0f4f8f67412d1a93af",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; pyramid layout is clean and matches the style.",
+        "recorded_at": "2026-06-24T15:29:58Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_09",
+      "number": 9,
+      "title": "命題計畫：認知層次與難度配置",
+      "job": "prompts/slide_09.json",
+      "out": "origin_image/slide_09.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_09",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_09.json",
+        "prompt_sha256": "584fc9e0340019cbcf00c3f973570c3a72c36b3887625f7ae9ed30f34d0ef3f1",
+        "dispatched_at": "2026-06-24T15:28:19Z"
+      },
+      "result": {
+        "agent_id": "worker_09",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_09_candidate.png",
+        "selected_source_sha256": "f10c33c3cc427cdfe9c1b4ace0c05d62b83c1344945a781a47432fca50d0e9cc",
+        "final_image": "origin_image/slide_09.png",
+        "final_image_sha256": "f10c33c3cc427cdfe9c1b4ace0c05d62b83c1344945a781a47432fca50d0e9cc",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; table matches specifications.",
+        "recorded_at": "2026-06-24T15:30:45Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_10",
+      "number": 10,
+      "title": "一鍵生成：Kahoot! AI 與 Quizizz AI",
+      "job": "prompts/slide_10.json",
+      "out": "origin_image/slide_10.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_10",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_10.json",
+        "prompt_sha256": "00935fb741f44904515654906a8ea630c4efce9388e73f7e4154f2c7668c9829",
+        "dispatched_at": "2026-06-24T15:28:23Z"
+      },
+      "result": {
+        "agent_id": "worker_10",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_10_candidate.png",
+        "selected_source_sha256": "cfe923e1ca2401520d9ca81a44074938b0d309137b17ef081938a926a22b64dc",
+        "final_image": "origin_image/slide_10.png",
+        "final_image_sha256": "cfe923e1ca2401520d9ca81a44074938b0d309137b17ef081938a926a22b64dc",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; two comparative columns look clean.",
+        "recorded_at": "2026-06-24T15:30:10Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_11",
+      "number": 11,
+      "title": "智慧診斷：Edcafe AI 與個人化學習回饋",
+      "job": "prompts/slide_11.json",
+      "out": "origin_image/slide_11.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_11",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_11.json",
+        "prompt_sha256": "6380d5e89b5920ada95b5c9ac2b2505c3b6d90bbf1d47fe9a9a593b62d5e5503",
+        "dispatched_at": "2026-06-24T15:28:24Z"
+      },
+      "result": {
+        "agent_id": "worker_11",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_11_candidate.png",
+        "selected_source_sha256": "4518520e1c0c795cd4b19b1bf44b35172a8abe2df6f3bc2b6615a8823e186b23",
+        "final_image": "origin_image/slide_11.png",
+        "final_image_sha256": "4518520e1c0c795cd4b19b1bf44b35172a8abe2df6f3bc2b6615a8823e186b23",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; mockup screen matches visual rules.",
+        "recorded_at": "2026-06-24T15:30:10Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_12",
+      "number": 12,
+      "title": "如何與 AI 對話？出題提示詞的黃金結構",
+      "job": "prompts/slide_12.json",
+      "out": "origin_image/slide_12.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_12",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_12.json",
+        "prompt_sha256": "948edf0976ae838d11896007e3abf3ef6e0496731e219929e8c9f318ebf8bfd4",
+        "dispatched_at": "2026-06-24T15:28:26Z"
+      },
+      "result": {
+        "agent_id": "worker_12",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_12_candidate.png",
+        "selected_source_sha256": "f661ebe020ef7d772aa6f4f00bd65cb69dbfe7d7e3c2294b34b83e9e2f612dc1",
+        "final_image": "origin_image/slide_12.png",
+        "final_image_sha256": "f661ebe020ef7d772aa6f4f00bd65cb69dbfe7d7e3c2294b34b83e9e2f612dc1",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; four-step process design matches visual rules.",
+        "recorded_at": "2026-06-24T15:30:18Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_13",
+      "number": 13,
+      "title": "影音命題：鹽沼天牛生存機制測驗生成",
+      "job": "prompts/slide_13.json",
+      "out": "origin_image/slide_13.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_13",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_13.json",
+        "prompt_sha256": "fb6523c16f629e4a0fc99b581dffd25ccdeccbd72ce5bdb83a5a2578ea061562",
+        "dispatched_at": "2026-06-24T15:29:58Z"
+      },
+      "result": {
+        "agent_id": "worker_13",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_13_candidate.png",
+        "selected_source_sha256": "cfdd0d870be6bb19aa2571232f40c906ddca0dbee602705397214770c6f43eac",
+        "final_image": "origin_image/slide_13.png",
+        "final_image_sha256": "cfdd0d870be6bb19aa2571232f40c906ddca0dbee602705397214770c6f43eac",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; horizontal workflow layout is clean.",
+        "recorded_at": "2026-06-24T15:31:36Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_14",
+      "number": 14,
+      "title": "實驗命題：將課本實驗轉為探究題組",
+      "job": "prompts/slide_14.json",
+      "out": "origin_image/slide_14.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_14",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_14.json",
+        "prompt_sha256": "940089604334e102e198ac186c9c3408939e7bb19513f3ccfe026faa535cb612",
+        "dispatched_at": "2026-06-24T15:30:02Z"
+      },
+      "result": {
+        "agent_id": "worker_14",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_14_candidate.png",
+        "selected_source_sha256": "a73358f6d918e6481cf08e971497e7e476c41056c5b07f17a96bf9fec14aa242",
+        "final_image": "origin_image/slide_14.png",
+        "final_image_sha256": "a73358f6d918e6481cf08e971497e7e476c41056c5b07f17a96bf9fec14aa242",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; lab experiment visual style is clean.",
+        "recorded_at": "2026-06-24T15:31:39Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_15",
+      "number": 15,
+      "title": "視覺出題：讓圖表、構造圖自動出題",
+      "job": "prompts/slide_15.json",
+      "out": "origin_image/slide_15.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_15",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_15.json",
+        "prompt_sha256": "7650cb90337e52e54e227f01b64223302e469c20257955037d83f19f7928b621",
+        "dispatched_at": "2026-06-24T15:30:10Z"
+      },
+      "result": {
+        "agent_id": "worker_15",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_15_candidate.png",
+        "selected_source_sha256": "9a060fd2dd10365f088c9f8472df2dcc336b057cdd832807a2a878bccac180fc",
+        "final_image": "origin_image/slide_15.png",
+        "final_image_sha256": "9a060fd2dd10365f088c9f8472df2dcc336b057cdd832807a2a878bccac180fc",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; visual pointer diagram aligns properly.",
+        "recorded_at": "2026-06-24T15:31:53Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_16",
+      "number": 16,
+      "title": "出題工具箱：各大 AI 模型能力評比",
+      "job": "prompts/slide_16.json",
+      "out": "origin_image/slide_16.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_16",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_16.json",
+        "prompt_sha256": "ab1eb7b23c74bee350d8460edf9648bb5d1c125fcb50d200c57b2b3d639974ea",
+        "dispatched_at": "2026-06-24T15:30:10Z"
+      },
+      "result": {
+        "agent_id": "worker_16",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_16_candidate.png",
+        "selected_source_sha256": "e5247b2c147edb333c3a729ad6d895b7f0e6eb2abf4300f9f9787f31eb8ea546",
+        "final_image": "origin_image/slide_16.png",
+        "final_image_sha256": "e5247b2c147edb333c3a729ad6d895b7f0e6eb2abf4300f9f9787f31eb8ea546",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; comparison matrix layout is clean.",
+        "recorded_at": "2026-06-24T15:31:57Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_17",
+      "number": 17,
+      "title": "拒絕瑕疵：如何設計有效的誘答選項",
+      "job": "prompts/slide_17.json",
+      "out": "origin_image/slide_17.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_17",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_17.json",
+        "prompt_sha256": "3e71dc58fe4e3d8b51aa339493aa1f3227caddd63ecb445cc44ed370db394a13",
+        "dispatched_at": "2026-06-24T15:30:18Z"
+      },
+      "result": {
+        "agent_id": "worker_17",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_17_candidate.png",
+        "selected_source_sha256": "39a6051950f81f2b8c5d0e8f9113fa7ce87159860ff50f0b0b069dc9eb0d4e5a",
+        "final_image": "origin_image/slide_17.png",
+        "final_image_sha256": "39a6051950f81f2b8c5d0e8f9113fa7ce87159860ff50f0b0b069dc9eb0d4e5a",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; two-column comparison layout is clean.",
+        "recorded_at": "2026-06-24T15:31:57Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_18",
+      "number": 18,
+      "title": "傳統題目改造：菌根題目升級實踐",
+      "job": "prompts/slide_18.json",
+      "out": "origin_image/slide_18.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "accepted",
+      "dispatch": null,
+      "result": {
+        "final_image": "origin_image/slide_18.png",
+        "accepted_sample": true
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_19",
+      "number": 19,
+      "title": "題型轉換：將選擇題變為手寫問答題",
+      "job": "prompts/slide_19.json",
+      "out": "origin_image/slide_19.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_19",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_19.json",
+        "prompt_sha256": "cda1955c6ff56dcdcee6df9479dd29bce3674604391e0bf4e81bb20f7e3a9b6a",
+        "dispatched_at": "2026-06-24T15:30:46Z"
+      },
+      "result": {
+        "agent_id": "worker_19",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_19_candidate.png",
+        "selected_source_sha256": "7531502a3d71ecdc57724ab9ade678ce13f3bf4e90a563761f2f772433185681",
+        "final_image": "origin_image/slide_19.png",
+        "final_image_sha256": "7531502a3d71ecdc57724ab9ade678ce13f3bf4e90a563761f2f772433185681",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; question transformation visual matches style.",
+        "recorded_at": "2026-06-24T15:32:09Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_20",
+      "number": 20,
+      "title": "評改標準化：階段式 Rubrics 設計",
+      "job": "prompts/slide_20.json",
+      "out": "origin_image/slide_20.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_20",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_20.json",
+        "prompt_sha256": "c3f196f6a26ef7fd8455320a1c8da1a4ee8985aa5740221ccd7f4d82ac5b65fd",
+        "dispatched_at": "2026-06-24T15:31:36Z"
+      },
+      "result": {
+        "agent_id": "worker_20",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_20_candidate.png",
+        "selected_source_sha256": "c8f3ea340b71a4805b14b09405ddb880ed9d45b12024da84a18de46d43512734",
+        "final_image": "origin_image/slide_20.png",
+        "final_image_sha256": "c8f3ea340b71a4805b14b09405ddb880ed9d45b12024da84a18de46d43512734",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; ladder diagram aligns properly.",
+        "recorded_at": "2026-06-24T15:33:03Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_21",
+      "number": 21,
+      "title": "手寫考卷批改：AI 視覺評分實務",
+      "job": "prompts/slide_21.json",
+      "out": "origin_image/slide_21.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_21",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_21.json",
+        "prompt_sha256": "1506e6bb0e9282e55c69b544f7f507dbfe49409c86fa0e85ef46dea6cddc6792",
+        "dispatched_at": "2026-06-24T15:31:39Z"
+      },
+      "result": {
+        "agent_id": "worker_21",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_21_candidate.png",
+        "selected_source_sha256": "e28392a266ec1ccc8e866f0038f93bbd00f702c8e85bb863b3501709d3f8e195",
+        "final_image": "origin_image/slide_21.png",
+        "final_image_sha256": "e28392a266ec1ccc8e866f0038f93bbd00f702c8e85bb863b3501709d3f8e195",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; grading process layout is clean.",
+        "recorded_at": "2026-06-24T15:33:21Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_22",
+      "number": 22,
+      "title": "國寫作文批改：AI 等級評閱實踐",
+      "job": "prompts/slide_22.json",
+      "out": "origin_image/slide_22.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_22",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_22.json",
+        "prompt_sha256": "9681e29e7be61ee2c8e440880b54c72050cd96dbc361667341c5366351c15356",
+        "dispatched_at": "2026-06-24T15:31:53Z"
+      },
+      "result": {
+        "agent_id": "worker_22",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_22_candidate.png",
+        "selected_source_sha256": "843924dd156bdf01e4e4125448a5a0074758cad8d63694fb475d9f4021147eee",
+        "final_image": "origin_image/slide_22.png",
+        "final_image_sha256": "843924dd156bdf01e4e4125448a5a0074758cad8d63694fb475d9f4021147eee",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; essay grading mockup is clean.",
+        "recorded_at": "2026-06-24T15:33:33Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_23",
+      "number": 23,
+      "title": "Gradescope：師生評量的智慧助手",
+      "job": "prompts/slide_23.json",
+      "out": "origin_image/slide_23.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_23",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_23.json",
+        "prompt_sha256": "e5a9b31f31dc9467c6b64e2663743c143caa3848f0fa0571f6a77e1ccf5c669e",
+        "dispatched_at": "2026-06-24T15:31:58Z"
+      },
+      "result": {
+        "agent_id": "worker_23",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_23_candidate.png",
+        "selected_source_sha256": "def8a5cb670146324c577a76ee0bafdcbb42937f460a4ef1c6e9a4e4e7613cec",
+        "final_image": "origin_image/slide_23.png",
+        "final_image_sha256": "def8a5cb670146324c577a76ee0bafdcbb42937f460a4ef1c6e9a4e4e7613cec",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; Gradescope grouping mockup is clean.",
+        "recorded_at": "2026-06-24T15:33:36Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_24",
+      "number": 24,
+      "title": "一鍵解析：考卷詳解與概念庫建立",
+      "job": "prompts/slide_24.json",
+      "out": "origin_image/slide_24.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_24",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_24.json",
+        "prompt_sha256": "fb911a3ed678578dedd6dc54c5cff1eaa0368708b4403e7b4a04873f1493bc0d",
+        "dispatched_at": "2026-06-24T15:31:58Z"
+      },
+      "result": {
+        "agent_id": "worker_24",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_24_candidate.png",
+        "selected_source_sha256": "67bb71e1bc793f090b0be83be58dd0510f2d018303d67734d6a73746a4660103",
+        "final_image": "origin_image/slide_24.png",
+        "final_image_sha256": "67bb71e1bc793f090b0be83be58dd0510f2d018303d67734d6a73746a4660103",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; detail explanation workflow is clean.",
+        "recorded_at": "2026-06-24T15:33:36Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_25",
+      "number": 25,
+      "title": "趨勢透視：115學測自然科深度分析",
+      "job": "prompts/slide_25.json",
+      "out": "origin_image/slide_25.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_25",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_25.json",
+        "prompt_sha256": "56db70316ef019287f50a134476064c6a9b5535b6fabb19cabec5fd24f54ad07",
+        "dispatched_at": "2026-06-24T15:32:09Z"
+      },
+      "result": {
+        "agent_id": "worker_25",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_25_candidate.png",
+        "selected_source_sha256": "7844ef504de1d728c52b5b350465308c34b9dde25b0c5a20d381f9c6fcd1260a",
+        "final_image": "origin_image/slide_25.png",
+        "final_image_sha256": "7844ef504de1d728c52b5b350465308c34b9dde25b0c5a20d381f9c6fcd1260a",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; pie chart aligns properly with A-style theme.",
+        "recorded_at": "2026-06-24T15:33:30Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_26",
+      "number": 26,
+      "title": "NotebookLM：建立班級專屬解題 Bot",
+      "job": "prompts/slide_26.json",
+      "out": "origin_image/slide_26.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_26",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_26.json",
+        "prompt_sha256": "e78efd429330e106dc186479808528c47cd5d1653f67b6a99b6f4a58bc8418c0",
+        "dispatched_at": "2026-06-24T15:33:03Z"
+      },
+      "result": {
+        "agent_id": "worker_26",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_26_candidate.png",
+        "selected_source_sha256": "4e34215eaafeef0b0aa6b2ffe90a0f2e36339729d9c2331047024ff64ab75ee5",
+        "final_image": "origin_image/slide_26.png",
+        "final_image_sha256": "4e34215eaafeef0b0aa6b2ffe90a0f2e36339729d9c2331047024ff64ab75ee5",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; NotebookLM architecture layout matches A-style rules.",
+        "recorded_at": "2026-06-24T15:34:41Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_27",
+      "number": 27,
+      "title": "客製化 Bot：GPTs 專案與 Gemini Gem 設定",
+      "job": "prompts/slide_27.json",
+      "out": "origin_image/slide_27.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_27",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_27.json",
+        "prompt_sha256": "853271515a859b9ce6ae137608ae9472219907165babc54d7cb29e691c99af27",
+        "dispatched_at": "2026-06-24T15:33:21Z"
+      },
+      "result": {
+        "agent_id": "worker_27",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_27_candidate.png",
+        "selected_source_sha256": "2c5991360ac8d4374b4dee9566aa2a06e662b91a2120f2ccac3e2a81824e31a2",
+        "final_image": "origin_image/slide_27.png",
+        "final_image_sha256": "2c5991360ac8d4374b4dee9566aa2a06e662b91a2120f2ccac3e2a81824e31a2",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; side-by-side card layout matches rules.",
+        "recorded_at": "2026-06-24T15:34:59Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_28",
+      "number": 28,
+      "title": "AI 代理人：一鍵生成完整試卷與解答",
+      "job": "prompts/slide_28.json",
+      "out": "origin_image/slide_28.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_28",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_28.json",
+        "prompt_sha256": "6afe0c6de9f484f40ec4e8e8f41669787f32d37196987e494781601f89c585da",
+        "dispatched_at": "2026-06-24T15:33:30Z"
+      },
+      "result": {
+        "agent_id": "worker_28",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_28_candidate.png",
+        "selected_source_sha256": "feb5a5ee0c381a833a659df8556006a0e3155779994b7e935016e1be86d2aace",
+        "final_image": "origin_image/slide_28.png",
+        "final_image_sha256": "feb5a5ee0c381a833a659df8556006a0e3155779994b7e935016e1be86d2aace",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; workflow layout matches specifications.",
+        "recorded_at": "2026-06-24T15:35:06Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_29",
+      "number": 29,
+      "title": "自動化成果：光合作用與呼吸作用考卷",
+      "job": "prompts/slide_29.json",
+      "out": "origin_image/slide_29.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_29",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_29.json",
+        "prompt_sha256": "f49a506a23f14f073a8d3ab42ccac5b94bb47ed7e02c4db23a551562f53187a2",
+        "dispatched_at": "2026-06-24T15:33:33Z"
+      },
+      "result": {
+        "agent_id": "worker_29",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_29_candidate.png",
+        "selected_source_sha256": "f76c08b88a5370f86a2dad0c2e3e9d93aabdbfbd59f8a89b841cc7976c915a34",
+        "final_image": "origin_image/slide_29.png",
+        "final_image_sha256": "f76c08b88a5370f86a2dad0c2e3e9d93aabdbfbd59f8a89b841cc7976c915a34",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; agent output preview matches styling.",
+        "recorded_at": "2026-06-24T15:35:15Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_30",
+      "number": 30,
+      "title": "AI 與教師的協同進化",
+      "job": "prompts/slide_30.json",
+      "out": "origin_image/slide_30.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_30",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_30.json",
+        "prompt_sha256": "640df7b14d980d3a2476633bb89302b0effb1d13bdaf15045e9eca0e01e96bb5",
+        "dispatched_at": "2026-06-24T15:33:36Z"
+      },
+      "result": {
+        "agent_id": "worker_30",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_30_candidate.png",
+        "selected_source_sha256": "fe64f091c7b6a0643741dad2f6a1a37956a8608446d8f2fb24c9e0bd1781f795",
+        "final_image": "origin_image/slide_30.png",
+        "final_image_sha256": "fe64f091c7b6a0643741dad2f6a1a37956a8608446d8f2fb24c9e0bd1781f795",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; balance scale concept aligns perfectly.",
+        "recorded_at": "2026-06-24T15:35:15Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_31",
+      "number": 31,
+      "title": "您的 AI 落地行動方案：從明天開始",
+      "job": "prompts/slide_31.json",
+      "out": "origin_image/slide_31.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_31",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_31.json",
+        "prompt_sha256": "5681113631c37a014212d72615c24b5a305e12f61863c03444e1a008facedf59",
+        "dispatched_at": "2026-06-24T15:33:36Z"
+      },
+      "result": {
+        "agent_id": "worker_31",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_31_candidate.png",
+        "selected_source_sha256": "373fc81ea77bbd1864e6943b042217da57eab28562215a57eb3ee7398c8a1512",
+        "final_image": "origin_image/slide_31.png",
+        "final_image_sha256": "373fc81ea77bbd1864e6943b042217da57eab28562215a57eb3ee7398c8a1512",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; timeline nodes match visual rules.",
+        "recorded_at": "2026-06-24T15:35:06Z"
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_32",
+      "number": 32,
+      "title": "用 AI 賦能教學，釋放更多創造力！",
+      "job": "prompts/slide_32.json",
+      "out": "origin_image/slide_32.png",
+      "input_images": [],
+      "style_reference_images": [
+        {
+          "path": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/origin_image/slide_18.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content"
+        }
+      ],
+      "requires_context_images": false,
+      "expected_generation_mode": "generate",
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "worker_32",
+        "agent_nickname": null,
+        "prompt": "prompts/slide_32.json",
+        "prompt_sha256": "8a3a7b861a847827cdfb1cfeb95eaf52b166b7f2735fa1138e359dbaf3e352c4",
+        "dispatched_at": "2026-06-24T15:34:41Z"
+      },
+      "result": {
+        "agent_id": "worker_32",
+        "backend_used": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "selected_source": "/Users/froglssh/Library/CloudStorage/GoogleDrive-frog@lssh.tp.edu.tw/我的雲端硬碟/0AI應用/0-AI輔助出改解題/AI輔助考卷出改解題研習/drafts/slide_32_candidate.png",
+        "selected_source_sha256": "73bf6ee29f4bf260655cd55d40590ae7c6f574ea43a1b2e06905e93b7099b7df",
+        "final_image": "origin_image/slide_32.png",
+        "final_image_sha256": "73bf6ee29f4bf260655cd55d40590ae7c6f574ea43a1b2e06905e93b7099b7df",
+        "expected_backend": "scripts/image_gen.py --backend auto (codex-oauth)",
+        "expected_backend_labels": [
+          "scripts/image_gen.py --backend auto (codex-oauth)",
+          "scripts/image_gen.py"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Text readable; closing QR code aligns properly.",
+        "recorded_at": "2026-06-24T15:35:57Z"
+      },
+      "blocker": null
+    }
+  ],
+  "updated_at": "2026-06-24T15:35:57Z"
+}
