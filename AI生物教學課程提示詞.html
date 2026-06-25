@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高中生物提示詞生成平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入 React 與 ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- 引入 Babel 用於瀏覽器端編譯 JSX -->
+  <script src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #f8fafc;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #aaa;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // --- 1. 自動化圖示組件 (解決 ReferenceError 問題) ---
+    const createIcon = (paths) => ({ size = 24, className = "" }) => (
+      <svg width={size} height={size} className={className} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{__html: paths}} />
+    );
+
+    const BookText = createIcon('<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M8 7h6"/><path d="M8 11h8"/>');
+    const FileQuestion = createIcon('<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><circle cx="12" cy="17" r="1"/><path d="M12 14v-2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2"/>');
+    const Presentation = createIcon('<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/>');
+    const Boxes = createIcon('<path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"/><path d="m7 16.5-4.74-2.85"/><path d="m7 16.5 5-3"/><path d="M7 16.5v5.17"/><path d="M12 13.5V8L7 5l-4.03 2.42A2 2 0 0 0 2 9.13v3.24a2 2 0 0 0 .97 1.71l3 1.8l5-3Z"/><path d="m7 11.5-4.74-2.85"/><path d="M7 11.5 12 8"/><path d="M21.03 12.92A2 2 0 0 1 22 14.63v3.24a2 2 0 0 1-.97 1.71l-3 1.8a2 2 0 0 1-2.06 0L12 19v-5.5l5-3 4.03 2.42Z"/><path d="m17 16.5 4.74-2.85"/><path d="m17 16.5-5-3"/><path d="M17 16.5v5.17"/>');
+    const Image = createIcon('<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>');
+    const Check = createIcon('<path d="M20 6 9 17l-5-5"/>');
+    const Copy = createIcon('<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>');
+    const ExternalLink = createIcon('<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>');
+    const Info = createIcon('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>');
+    const BookOpen = createIcon('<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>');
+    const Clock = createIcon('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>');
+    const Target = createIcon('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>');
+    const Users = createIcon('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>');
+    const Settings = createIcon('<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>');
+    const AlertCircle = createIcon('<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>');
+    const SlidersHorizontal = createIcon('<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>');
+    const Palette = createIcon('<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>');
+    const Signal = createIcon('<path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/>');
+    const FileText = createIcon('<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/>');
+    const Database = createIcon('<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>');
+    const Key = createIcon('<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>');
+    const Table = createIcon('<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="3" x2="21" y1="15" y2="15"/><line x1="9" x2="9" y1="9" y2="21"/><line x1="15" x2="15" y1="9" y2="21"/>');
+    const PenTool = createIcon('<path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/>');
+    const Zap = createIcon('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>');
+    const Layout = createIcon('<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="9" y2="21"/>');
+    const MessageSquarePlus = createIcon('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/><line x1="9" x2="15" y1="10" y2="10"/><line x1="12" x2="12" y1="7" y2="13"/>');
+    const Layers = createIcon('<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/>');
+    const Eye = createIcon('<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>');
+    const ChevronUp = createIcon('<path d="m18 15-6-6-6 6"/>');
+    const ChevronDown = createIcon('<path d="m6 9 6 6 6-6"/>');
+    const Wand2 = createIcon('<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.21 1.21 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/>');
+    const HelpCircle = createIcon('<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/>');
+    const CheckSquare = createIcon('<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><polyline points="9 11 12 14 22 4"/>');
+    const Square = createIcon('<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>');
+
+    // --- 2. 類型與常數定義 (精確對齊 source code) ---
+    const ModuleType = { LESSON_PLAN: 'LESSON_PLAN', QUESTION: 'QUESTION', MATERIALS: 'MATERIALS', SLIDES: 'SLIDES', INFOGRAPHIC: 'INFOGRAPHIC' };
+    const GradeLevel = { GRADE_1: '高中一年級 (一般程度)', GRADE_2: '高中二年級 (已具基礎)', GRADE_3: '高中三年級 (升學導向)' };
+    const StudentLevel = { BASIC: '基礎班 (需多譬喻/圖解)', NORMAL: '普通班 (標準進度)', ADVANCED: '資優班 (延伸閱讀/高階思考)', REMEDIAL: '補救教學 (步驟拆解/慢進度)' };
+    const BloomLevel = { REMEMBER: '★☆☆☆☆ 基礎認知 (定義/記憶)', APPLY: '★★☆☆☆ 簡易應用 (公式/推論)', ANALYZE: '★★★☆☆ 中等整合 (連結/圖表)', EVALUATE: '★★★★☆ 進階分析 (批判/變因)', CREATE: '★★★★★ 挑戰探究 (創新/設計)' };
+    const SlideStyle = {
+      PRACTICE_DRILL: '例題演練風 (步驟解析)', KEY_POINT_FOCUSED: '重點導向簡報 (條列主導)', TEXTBOOK_MAPPING: '課本對照風 (概念 + 例題)', CLASSROOM_ACTIVITY: '課堂活動風 (互動式問題)', EXAM_REVIEW: '考試複習風 (考點框架)',
+      RETRO_COMIC: '復古漫畫動作藍圖 (Retro-Comic Action Blueprint)', BLUEPRINT: '工程藍圖示意圖 (Engineering Blueprint Schematic)', THERMAL: '熱成像數據科技風 (Thermal Insight Tech)', NEUMORPHIC: '紐莫變形科技圖解 (Neumorphic Tech Schematic)', RISOGRAPH: '孔版印刷 復古普普風 (Risograph / Retro-Pop)', MANGA: '日式漫畫教學風格 (Manga / Instructional Comic)', CYBERPUNK: '賽博龐克抬頭顯示器 (Cyberpunk / Dark Mode HUD)', DINER: '美式復古餐廳 海報 (American Diner Vintage Americana)', SUMI_E: '水墨科技卷軸 (Sumi-e Tech Scroll / Neo-Traditional)', SKETCH: '教育手繪筆記 (Educational Sketch-Note / Workshop)', GLASSMORPHISM: '2026趨勢：玻璃擬態 (Glassmorphism)', BENTO: '2026趨勢：便當盒風格 (Bento Box Style)', SWISS: '2026趨勢：瑞士風格 (Swiss Style)'
+    };
+    const InfographicStyle = { FLAT: '扁平化風格 (Flat Design)', ISOMETRIC: '等距 2.5D 風格 (Isometric Style)', HAND_DRAWN: '手繪塗鴉風格 (Hand-Drawn)', MINIMALIST: '極簡主義風格 (Minimalist)', VINTAGE: '復古報紙風格 (Vintage)', CYBERPUNK: '賽博龐克風格 (Cyberpunk)', CLAY_3D: '3D 黏土動畫風 (3D Clay)', DASHBOARD: '數據儀表板風格 (Dashboard UI)' };
+    const SlideImageSource = { AI_GENERATED: '使用 AI 自動生成', SOURCE_FILE: '使用來源檔案中的圖片 (引用課本/講義)' };
+
+    // 同步完整的 TEXTBOOK_DATA
+    const TEXTBOOK_DATA = {
+      "高中生物(全)": [
+        { title: "第1章：細胞的構造與功能", sections: ["第1節：細胞學說的發展", "第2節：細胞的構造與功能", "第3節：細胞與能量", "第4節：細胞分裂"] },
+        { title: "第2章：生殖與遺傳", sections: ["第1節：性狀的遺傳", "第2節：染色體與遺傳", "第3節：遺傳物質", "第4節：遺傳變異與環境因子影響性狀的表現", "第5節：遺傳工程技術及其應用"] },
+        { title: "第3章：演化與生物多樣性", sections: ["第1節：演化理論的發展", "第2節：分類與演化"] }
+      ],
+      "選修生物(一)": [
+        { title: "第1章：細胞的構造與功能", sections: ["第1節：細胞的分子組成", "第2節：細胞的構造", "第3節：細胞的生命歷程"] },
+        { title: "第2章：細胞的代謝與能量", sections: ["第1節：生物中的化學反應", "第2節：能量流轉與生命維持的關係", "第3節：呼吸作用"] },
+        { title: "第3章：生殖與遺傳", sections: ["第1節：染色體與遺傳", "第2節：遺傳物質的研究歷程", "第3節：DNA的複製", "第4節：基因的表現", "第5節：遺傳變異", "第6節：生物科技的應用"] }
+      ],
+      "選修生物(二)": [
+        { title: "第1章：生命的起源與演化", sections: ["第1節：生源說與無生源說", "第2節：有機演化", "第3節：原核細胞的形成", "第4節：真核細胞的形成"] },
+        { title: "第2章：植物體的組成層次", sections: ["第1節：植物的組成層次", "第2節：營養器官的構造與功能"] },
+        { title: "第3章：植物的營養與生殖", sections: ["第1節：光合作用", "第2節：植物的物質吸收與運輸"] },
+        { title: "第4章：植物對刺激的反應", sections: ["第1節：植物的生殖", "第2節：植物體生理作用的調節", "第3節：植物對環境刺激的反應"] }
+      ],
+      "選修生物(三)": [
+        { title: "第1章：動物體的構造與功能", sections: ["第1節：動物體的組成層次", "第2節：恆定性"] },
+        { title: "第2章：動物體的物質交換與運輸", sections: ["第1節：動物體的循環", "第2節：動物體的消化與吸收", "第3節：動物體的呼吸", "第4節：動物體的排泄"] },
+        { title: "第3章：動物體的感應與協調", sections: ["第1節：神經系統", "第2節：內分泌系統", "第3節：免疫系統"] },
+        { title: "第4章：動物體的生殖與胚胎發育", sections: ["第1節：男性的生殖系統與配子的形成", "第2節：女性的生殖系統", "第3節：女性的生殖週期"] }
+      ],
+      "選修生物(四)": [
+        { title: "第1章：演化", sections: ["第1節：演化理論的發展", "第2節：族群的演化", "第3節：族群演化的機制", "第4節：演化與物種形成"] },
+        { title: "第2章：生物與環境交互作用", sections: ["第1節：個體與族群", "第2節：群集", "第3節：生態系"] },
+        { title: "第3章：生物多樣性與保育", sections: ["第1節：生物多樣性", "第2節：臺灣的生物多樣性", "第3節：生物多樣性的保育"] }
+      ]
+    };
+    const BOOK_VERSIONS = ["高中生物(全)", "選修生物(一)", "選修生物(二)", "選修生物(三)", "選修生物(四)"];
+
+    const DURATION_OPTIONS = [
+      { label: "單節課 (50分鐘)", value: "50m", desc: "引起動機(5m) -> 發展(35m) -> 結語(10m)" },
+      { label: "微課程 (25分鐘)", value: "25m", desc: "晨考檢討或快速複習" },
+      { label: "雙節課 (100分鐘)", value: "100m", desc: "完整「引起→發展→實作→評量」循環" },
+      { label: "長時程 (120分鐘+)", value: "120m+", desc: "實驗操作、PBL 專題研究" }
+    ];
+
+    const TEACHING_METHOD_GROUPS = [
+      { label: "探究式 (Inquiry)", options: ["5E 探究教學法 (Engage, Explore, Explain, Elaborate, Evaluate)", "POE 教學法 (Predict, Observe, Explain) 預測-觀察-解釋", "IBL 探究式學習 (Inquiry-Based Learning)", "PBL 專題導向學習 (Project-Based Learning)", "問題導向學習 (Problem-Based Learning)", "STEAM 教學法"] },
+      { label: "合作式 (Cooperative)", options: ["Jigsaw 拼圖法", "合作學習 (Cooperative Learning)", "TBL 任務導向學習 (Task-Based Learning)", "討論教學法"] },
+      { label: "講授式 (Lecture)", options: ["講述教學法", "示範教學法", "案例教學法", "概念圖教學法"] },
+      { label: "實作與其他 (Practical & Other)", options: ["實驗教學法", "翻轉教室 (Flipped Classroom)", "自訂教學法"] }
+    ];
+
+    const LESSON_PLAN_THEMES = [
+      { label: "素養導向類", options: ["能培養學生核心素養的教案", "科學探究與實作能力培養", "批判性思維訓練", "問題解決能力培養", "跨領域整合學習"] },
+      { label: "生活應用類", options: ["結合生活情境的教案", "連結時事議題的教案", "環境永續教育", "健康促進教育", "科技素養教育"] },
+      { label: "考試導向類", options: ["學測重點複習", "分科測驗準備", "段考重點整理", "實驗操作技能訓練"] },
+      { label: "特殊主題類", options: ["科學史融入教學", "性別平等教育", "生命教育", "職涯探索", "原住民族教育", "多元文化教育"] },
+      { label: "其他", options: ["自訂"] }
+    ];
+
+    const QUESTION_TYPE_GROUPS = [
+      { label: "選擇題類", options: ["單選題 (4選1)", "單選題 (5選1)", "多選題 (不限選項數)", "是非題", "配合題"] },
+      { label: "填答題類", options: ["填充題", "簡答題", "問答題", "申論題"] },
+      { label: "實作題類", options: ["圖表判讀題", "實驗設計題", "數據分析題", "探究實作題"] },
+      { label: "素養導向題型", options: ["情境式題組", "跨領域整合題", "閱讀理解題", "資料判讀題"] }
+    ];
+
+    const EXPLANATION_TYPES = [
+      { label: "僅答案", desc: "適合快速測驗" }, { label: "簡答", desc: "20-30字關鍵說明" }, { label: "詳解", desc: "完整步驟與觀念釐清" }, { label: "深入解析", desc: "包含延伸知識與迷思概念分析" }
+    ];
+
+    // 同步完整的 108 課綱指標
+    const CURRICULUM_INDICATOR_GROUPS = [
+      {
+        label: "A. 科學探究能力 (Scientific Inquiry)",
+        options: [
+          { id: "A1-想像創造", desc: "能主動察覺問題，進而設計科學探索與實作" },
+          { id: "A2-推理論證", desc: "能對變數的性質與影響做適當的解釋" },
+          { id: "A3-批判思考", desc: "能對媒體報導或網路資訊的內容進行批判" },
+          { id: "A4-建立模型", desc: "能根據科學理論建立模型並應用於解決問題" }
+        ]
+      },
+      {
+        label: "B. 問題解決能力 (Problem Solving)",
+        options: [
+          { id: "B1-觀察與定題", desc: "能從日常生活察覺問題並提出探究議題" },
+          { id: "B2-計畫與執行", desc: "能設計適當的實驗步驟並正確操作儀器" },
+          { id: "B3-分析與發現", desc: "能由實驗數據分析規律並提出合理解釋" },
+          { id: "B4-討論與傳達", desc: "能正確運用科學語言呈現探究成果" }
+        ]
+      },
+      {
+        label: "C. 生物學核心概念 (Core Concepts)",
+        options: [
+          { id: "C1-細胞的構造與功能", desc: "了解細胞的基本構造與生理功能" },
+          { id: "C2-遺傳與生命延續", desc: "認識遺傳的基本原理與生命延續現象" },
+          { id: "C3-演化與多樣性", desc: "理解生物演化與多樣性的形成機制" },
+          { id: "C4-生態系與環境", desc: "了解生態系的組成與人類對環境的影響" },
+          { id: "C5-應用生物學", desc: "認識生物科技在生活與產業上的應用" }
+        ]
+      },
+      {
+        label: "D. 科學態度與素養 (Attitude & Literacy)",
+        options: [
+          { id: "D1-科學探究興趣", desc: "培養主動學習與探索科學現象的興趣" },
+          { id: "D2-科學思考習慣", desc: "養成以科學方法思考問題的習慣" },
+          { id: "D3-珍愛生命", desc: "培養尊重生命、珍惜資源的態度" },
+          { id: "D4-環境保護意識", desc: "具備環境保護與永續發展的理念" }
+        ]
+      },
+      {
+        label: "E. 跨領域素養 (Interdisciplinary)",
+        options: [
+          { id: "E1-閱讀理解", desc: "能閱讀並理解科普文章的內容" },
+          { id: "E2-數據判讀", desc: "能判讀圖表並進行數據分析" },
+          { id: "E3-跨科整合", desc: "能整合不同學科知識解決問題" },
+          { id: "E4-社會議題探討", desc: "能探討生物科學相關的社會議題" }
+        ]
+      }
+    ];
+
+    const QUICK_TEMPLATES = [
+      { id: 'lecture', label: '傳統講述', config: { method: '講述教學法', duration: '50m', lessonPlanTheme: '段考重點整理' } },
+      { id: 'inquiry', label: '探究實驗', config: { method: '5E 探究教學法 (Engage, Explore, Explain, Elaborate, Evaluate)', duration: '100m', lessonPlanTheme: '科學探究與實作能力培養' } },
+      { id: 'literacy', label: '素養導向', config: { method: 'PBL 專題導向學習 (Project-Based Learning)', duration: '100m', lessonPlanTheme: '跨領域整合學習' } }
+    ];
+
+    const MATERIAL_STYLES = ["課堂用講義 (Lecture Handout)", "閱讀理解學習單 (Reading Worksheet)", "實驗操作指引 (Lab Guide)", "心智圖 / 概念圖 (Concept Map)", "重點整理懶人包 (Summary Cheat Sheet)", "課後複習卷 (Review Sheet)"];
+    const MATERIAL_DIFFICULTIES = ["簡易 (Remedial) - 強調基礎定義與圖像輔助", "標準 (Standard) - 符合課本進度與難度", "進階 (Advanced) - 包含延伸閱讀與挑戰題"];
+    const MATERIAL_LENGTHS = ["10 分鐘微閱讀 (Short)", "1 堂課 (40-50分鐘) (Standard)", "2 堂課深度探究 (Deep Dive)"];
+    const MATERIAL_SOURCES = ["課本文本", "補充講義", "習作簿", "實驗紀錄簿", "歷屆考題", "科普新聞"];
+    const KEYWORD_FORMATS = ["名詞 : 白話定義 (Standard Definition)", "名詞 : 挖空填詞 (Cloze Test)", "名詞 : 英文對照 (Bilingual)", "名詞 : 圖像聯想 (Visual Mnemonic)"];
+    const TABLE_FORMATS = ["比較表格 (Comparison Table)", "流程圖解 (Process Flowchart)", "優缺點分析 (Pros & Cons)", "時間軸 (Timeline)"];
+    const EXAMPLE_FORMATS = ["單選題 + 解析", "簡答題 + 參考答案", "計算題 + 步驟詳解", "圖表判讀題"];
+    const PRACTICE_FORMATS = ["類題演練 (Similar Questions)", "進階挑戰 (Advanced Application)", "素養混合題組 (Mixed Type)"];
+    const SLIDE_STRUCTURES = ["標準結構 (標題→目標→內容→總結)", "5E 教學模式 (投入→探索→解釋→精緻化→評量)", "POE 結構 (預測→觀察→解釋)", "問題導向 (問題→探究→解決→應用)", "翻轉教學 (課前任務→課堂討論→課後延伸)", "自訂結構"];
+    const VISUAL_DENSITIES = ["高圖像（每頁1-2張圖片為主）", "平衡型（圖文各半）", "文字為主（少圖多文字說明）", "極簡風（每頁單一重點）"];
+    
+    // 加上 keywords 提供給 Prompt 邏輯對接
+    const INFOGRAPHIC_LAYOUT_OPTIONS = [
+      { label: "流程圖 (Flowchart)", value: "Flowchart", keywords: "Connected nodes, directional arrows, step-by-step progression, left-to-right flow" },
+      { label: "比較對照 (Comparison)", value: "Comparison", keywords: "Split screen layout, side-by-side comparison, contrasting elements, versus mode" },
+      { label: "時間軸 (Timeline)", value: "Timeline", keywords: "Chronological path, milestones, horizontal timeline, sequence of events" },
+      { label: "中心輻射 (Mind Map)", value: "MindMap", keywords: "Central hub, radiating branches, mind map structure, network diagram" },
+      { label: "數據儀表板 (Data Vis)", value: "DataVis", keywords: "Bar charts, pie charts, percentage rings, big data numbers, statistical layout" }
+    ];
+    const INFOGRAPHIC_DENSITY_OPTIONS = [
+      { label: "極簡重點 (Highlight)", value: "Highlight", keywords: "Minimal content, single focal point, negative space, uncluttered" },
+      { label: "標準摘要 (Summary)", value: "Summary", keywords: "Balanced layout, scannable sections, clear hierarchy" },
+      { label: "深度詳解 (Detailed)", value: "Detailed", keywords: "Information-rich, comprehensive, complex details, dense data packing" }
+    ];
+    const INFOGRAPHIC_HIERARCHY_OPTIONS = [
+      { label: "強調標題 (Title Focused)", value: "TitleFocused", keywords: "Large bold typography headings, typographic hierarchy, text-driven layout" },
+      { label: "強調圖像 (Visual First)", value: "VisualFirst", keywords: "Image-dominant layout, 70% visual content, large central illustration" }
+    ];
+    const INFOGRAPHIC_COLOR_OPTIONS = [
+      { label: "專業信任 (Trustworthy Blue)", value: "Professional", keywords: "Professional color palette, deep blues, crisp whites, and cool grays, corporate feel" },
+      { label: "活力吸睛 (Vibrant Pop)", value: "Vibrant", keywords: "High saturation colors, vibrant pop art colors, yellow and purple contrast, bold red accents" },
+      { label: "柔和療癒 (Pastel Calming)", value: "Pastel", keywords: "Pastel color palette, Morandi colors, low saturation, calming and soft tones" }
+    ];
+
+    // --- 3. 初始狀態設定 ---
+    const INITIAL_STATE = {
+      bookVersion: '', chapter: '', grade: '', studentLevel: '', duration: '50m', method: '', customMethod: '', theme: '', lessonPlanTheme: '', customLessonPlanTheme: '',
+      questionType: ['單選題 (4選1)'], questionConfig: { '單選題 (4選1)': { count: 5, difficulty: '★★☆☆☆ 簡易應用 (公式/推論)' } }, difficulty: '★★☆☆☆ 簡易應用 (公式/推論)', questionCount: 3, explanationType: '詳解',
+      slideStyle: '復古漫畫動作藍圖 (Retro-Comic Action Blueprint)', slideImageSource: SlideImageSource.AI_GENERATED, slideCount: 10, slideStructure: SLIDE_STRUCTURES[0], customSlideStructure: '', visualDensity: VISUAL_DENSITIES[1],
+      infographicStyle: '', infographicLayout: '', infographicDensity: '', infographicHierarchy: '', infographicColor: '',
+      customRequirements: '',
+      enableMaterialStyle: true, materialStyle: MATERIAL_STYLES[0], enableMaterialDifficulty: true, materialDifficulty: MATERIAL_DIFFICULTIES[1], enableMaterialLength: true, materialLength: MATERIAL_LENGTHS[1], enableMaterialSource: false, materialSource: [], enableKeywords: true, keywordsFormat: KEYWORD_FORMATS[0], customKeywords: '', enableTables: true, tablesFormat: TABLE_FORMATS[0], enableExamples: false, examplesFormat: EXAMPLE_FORMATS[0], enablePractice: false, practiceFormat: PRACTICE_FORMATS[0],
+      curriculumIndicators: []
+    };
+
+    const TAB_CONFIG = [
+      { id: ModuleType.LESSON_PLAN, label: '教案提示詞', icon: BookText, color: 'text-blue-600' },
+      { id: ModuleType.QUESTION, label: '題目提示詞', icon: FileQuestion, color: 'text-orange-600' },
+      { id: ModuleType.MATERIALS, label: '教材提示詞', icon: Boxes, color: 'text-emerald-600' },
+      { id: ModuleType.SLIDES, label: '簡報提示詞', icon: Presentation, color: 'text-indigo-600' },
+      { id: ModuleType.INFOGRAPHIC, label: '圖表提示詞', icon: Image, color: 'text-pink-600' },
+    ];
+
+    // --- 4. 子組件：預覽面板 ---
+    const PreviewPanel = ({ state }) => {
+      const isComplete = state.bookVersion && state.chapter;
+      return (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sticky top-6 lg:static">
+          <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <span className="w-2 h-6 bg-blue-500 rounded-full"></span>設定預覽 (Live Summary)
+          </h3>
+          {!isComplete ? (
+            <div className="p-4 bg-red-50 text-red-600 rounded-lg text-sm mb-4 border border-red-100 flex items-start gap-2">
+               <div className="mt-0.5">⚠️</div>
+               <div><strong>設定未完成</strong><p>請至少選擇「冊次」與「章節」以啟用生成功能。</p></div>
+            </div>
+          ) : (
+            <div className="p-4 bg-green-50 text-green-700 rounded-lg text-sm mb-4 border border-green-100 flex items-center gap-2">
+              <div className="text-lg">✅</div><div>設定已就緒，隨時可生成！</div>
+            </div>
+          )}
+          <div className="space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">基礎範圍</div>
+              <div className="font-medium text-slate-900 flex items-center gap-2">
+                <BookOpen size={16} className="text-blue-500" />{state.bookVersion || "未選擇冊次"}
+              </div>
+              <div className="font-medium text-slate-900 pl-6 text-sm mt-1">{state.chapter ? `CH: ${state.chapter}` : "未輸入章節"}</div>
+            </div>
+            <div className="border-b border-slate-100 pb-3">
+              <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">教學核心</div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-slate-700"><Users size={16} className="text-orange-500" /><span>{state.grade ? state.grade.split(' ')[0] : '-'}</span></div>
+                <div className="flex items-center gap-2 text-sm text-slate-700"><Clock size={16} className="text-orange-500" /><span>{state.duration || '-'}</span></div>
+                <div className="flex items-center gap-2 text-sm text-slate-700"><Target size={16} className="text-orange-500" /><span>{state.method || '-'}</span></div>
+              </div>
+            </div>
+            {state.curriculumIndicators.length > 0 && (
+              <div>
+                <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">課綱指標</div>
+                <div className="flex flex-wrap gap-1">
+                  {state.curriculumIndicators.map(id => (
+                    <span key={id} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs">{id}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // --- 5. 子組件：生成表單 ---
+    const GeneratorForm = ({ type, state, onChange, onGenerate, isGenerating }) => {
+      const [showAdvanced, setShowAdvanced] = useState(false);
+
+      const handleBookChange = (newBook) => { onChange({ bookVersion: newBook, chapter: '' }); };
+      const handleTemplateClick = (templateId) => {
+        const template = QUICK_TEMPLATES.find(t => t.id === templateId);
+        if (template) onChange(template.config);
+      };
+      const toggleQuestionType = (typeStr) => {
+        const currentTypes = state.questionType || [];
+        const currentConfig = state.questionConfig || {};
+        if (currentTypes.includes(typeStr)) {
+          onChange({ questionType: currentTypes.filter(t => t !== typeStr) });
+        } else {
+          const newConfig = { ...currentConfig };
+          if (!newConfig[typeStr]) newConfig[typeStr] = { count: 3, difficulty: state.difficulty || '★★☆☆☆ 簡易應用 (公式/推論)' };
+          onChange({ questionType: [...currentTypes, typeStr], questionConfig: newConfig });
+        }
+      };
+      const updateQuestionConfig = (typeStr, field, value) => {
+         const currentConfig = state.questionConfig || {};
+         const typeConfig = currentConfig[typeStr] || { count: 3, difficulty: '★★☆☆☆ 簡易應用 (公式/推論)' };
+         onChange({ questionConfig: { ...currentConfig, [typeStr]: { ...typeConfig, [field]: value } } });
+      };
+      const toggleMaterialSource = (source) => {
+        const currentSources = state.materialSource || [];
+        if (currentSources.includes(source)) onChange({ materialSource: currentSources.filter(s => s !== source) });
+        else onChange({ materialSource: [...currentSources, source] });
+      };
+
+      const isFormValid = state.bookVersion !== '' && state.chapter !== '';
+      const currentBookData = state.bookVersion ? TEXTBOOK_DATA[state.bookVersion] : [];
+
+      const renderBasicSection = () => (
+        <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mb-4">
+          <div className="flex items-center gap-2 mb-3 text-blue-800 font-semibold"><Settings size={18} /><h2>基本設定 (Foundation)</h2></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">冊次選擇 <span className="text-red-500">*</span></label>
+              <select className="w-full rounded-lg border-slate-300 border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white" value={state.bookVersion} onChange={(e) => handleBookChange(e.target.value)}>
+                <option value="">請選擇冊次</option>
+                {BOOK_VERSIONS.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">章節 / 重點 <span className="text-red-500">*</span></label>
+              <select className={`w-full rounded-lg border p-2.5 focus:ring-2 focus:ring-blue-500 outline-none bg-white ${!state.chapter && state.bookVersion ? 'border-red-300 bg-red-50/30' : 'border-slate-300'}`} value={state.chapter} onChange={(e) => onChange({ chapter: e.target.value })} disabled={!state.bookVersion}>
+                <option value="">{state.bookVersion ? "請選擇章節或單元" : "請先選擇冊次"}</option>
+                {currentBookData && currentBookData.map((chapter) => (
+                  <optgroup key={chapter.title} label={chapter.title}>
+                    <option value={chapter.title}>📂 全章：{chapter.title}</option>
+                    {chapter.sections.map((section) => <option key={section} value={`${chapter.title} ${section}`}>📄 {section}</option>)}
+                  </optgroup>
+                ))}
+              </select>
+              {!state.chapter && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><AlertCircle size={12} /> {state.bookVersion ? "必填欄位" : "請先選擇左側冊次"}</p>}
+            </div>
+          </div>
+        </div>
+      );
+
+      const renderMaterialsCore = () => (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2 text-emerald-800 font-semibold px-1"><SlidersHorizontal size={18} /><h2>細項設定 (Detailed Settings)</h2></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* 各細項設定區塊...保持原先良好的排版結構 */}
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-emerald-300 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                 <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><Palette size={16} /></div><span className="font-bold text-slate-800">教材樣式</span></div>
+                 <label className="relative inline-flex items-center cursor-pointer">
+                   <input type="checkbox" className="sr-only peer" checked={state.enableMaterialStyle} onChange={(e) => onChange({ enableMaterialStyle: e.target.checked })} />
+                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                 </label>
+              </div>
+              {state.enableMaterialStyle && (
+                <div className="mt-2 animate-fade-in">
+                  <select className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-emerald-500 outline-none" value={state.materialStyle} onChange={(e) => onChange({ materialStyle: e.target.value })}>
+                    {MATERIAL_STYLES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+            
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-emerald-300 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                 <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><Signal size={16} /></div><span className="font-bold text-slate-800">難度設定</span></div>
+                 <label className="relative inline-flex items-center cursor-pointer">
+                   <input type="checkbox" className="sr-only peer" checked={state.enableMaterialDifficulty} onChange={(e) => onChange({ enableMaterialDifficulty: e.target.checked })} />
+                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                 </label>
+              </div>
+              {state.enableMaterialDifficulty && (
+                <div className="mt-2 animate-fade-in">
+                  <select className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-emerald-500 outline-none" value={state.materialDifficulty} onChange={(e) => onChange({ materialDifficulty: e.target.value })}>
+                    {MATERIAL_DIFFICULTIES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-emerald-300 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                 <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><FileText size={16} /></div><span className="font-bold text-slate-800">份量</span></div>
+                 <label className="relative inline-flex items-center cursor-pointer">
+                   <input type="checkbox" className="sr-only peer" checked={state.enableMaterialLength} onChange={(e) => onChange({ enableMaterialLength: e.target.checked })} />
+                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                 </label>
+              </div>
+              {state.enableMaterialLength && (
+                <div className="mt-2 animate-fade-in">
+                  <select className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-emerald-500 outline-none" value={state.materialLength} onChange={(e) => onChange({ materialLength: e.target.value })}>
+                    {MATERIAL_LENGTHS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-emerald-300 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                 <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><Database size={16} /></div><span className="font-bold text-slate-800">資料來源 (可複選)</span></div>
+                 <label className="relative inline-flex items-center cursor-pointer">
+                   <input type="checkbox" className="sr-only peer" checked={state.enableMaterialSource} onChange={(e) => onChange({ enableMaterialSource: e.target.checked })} />
+                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                 </label>
+              </div>
+              {state.enableMaterialSource && (
+                <div className="mt-2 animate-fade-in flex flex-wrap gap-2">
+                  {MATERIAL_SOURCES.map(src => (
+                    <button key={src} onClick={() => toggleMaterialSource(src)} className={`px-2 py-1 text-xs rounded border transition-colors ${state.materialSource.includes(src) ? 'bg-orange-100 border-orange-300 text-orange-800' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}>
+                      {src} {state.materialSource.includes(src) ? '×' : '+'}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-emerald-300 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                 <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><Key size={16} /></div><span className="font-bold text-slate-800">關鍵名詞 (Keywords)</span></div>
+                 <label className="relative inline-flex items-center cursor-pointer">
+                   <input type="checkbox" className="sr-only peer" checked={state.enableKeywords} onChange={(e) => onChange({ enableKeywords: e.target.checked })} />
+                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                 </label>
+              </div>
+              {state.enableKeywords && (
+                 <div className="mt-2 animate-fade-in space-y-2">
+                   <select className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-emerald-500 outline-none" value={state.keywordsFormat} onChange={(e) => onChange({ keywordsFormat: e.target.value })}>
+                    {KEYWORD_FORMATS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  <input type="text" className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-emerald-500 outline-none mt-2 placeholder-slate-400" placeholder="自定義名詞 (選填，例如：粒線體、ATP...)" value={state.customKeywords || ''} onChange={(e) => onChange({ customKeywords: e.target.value })} />
+                 </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-emerald-300 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                 <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><Table size={16} /></div><span className="font-bold text-slate-800">表格式整理</span></div>
+                 <label className="relative inline-flex items-center cursor-pointer">
+                   <input type="checkbox" className="sr-only peer" checked={state.enableTables} onChange={(e) => onChange({ enableTables: e.target.checked })} />
+                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                 </label>
+              </div>
+              {state.enableTables && (
+                 <div className="mt-2 animate-fade-in space-y-2">
+                   <p className="text-xs text-slate-500">請以表格整理重點，類型如下：</p>
+                   <select className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-emerald-500 outline-none" value={state.tablesFormat} onChange={(e) => onChange({ tablesFormat: e.target.value })}>
+                    {TABLE_FORMATS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                 </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-emerald-300 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                 <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><PenTool size={16} /></div><span className="font-bold text-slate-800">例題 (Examples)</span></div>
+                 <label className="relative inline-flex items-center cursor-pointer">
+                   <input type="checkbox" className="sr-only peer" checked={state.enableExamples} onChange={(e) => onChange({ enableExamples: e.target.checked })} />
+                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                 </label>
+              </div>
+              {state.enableExamples && (
+                 <div className="mt-2 animate-fade-in space-y-2">
+                   <p className="text-xs text-slate-500">請設計 3 題例題，形式如下：</p>
+                   <select className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-emerald-500 outline-none" value={state.examplesFormat} onChange={(e) => onChange({ examplesFormat: e.target.value })}>
+                    {EXAMPLE_FORMATS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                 </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-emerald-300 transition-colors">
+              <div className="flex items-center justify-between mb-3">
+                 <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><Copy size={16} /></div><span className="font-bold text-slate-800">類題 (Practice)</span></div>
+                 <label className="relative inline-flex items-center cursor-pointer">
+                   <input type="checkbox" className="sr-only peer" checked={state.enablePractice} onChange={(e) => onChange({ enablePractice: e.target.checked })} />
+                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                 </label>
+              </div>
+              {state.enablePractice && (
+                 <div className="mt-2 animate-fade-in space-y-2">
+                   <p className="text-xs text-slate-500">請設計 3 題類題，形式如下：</p>
+                   <select className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-emerald-500 outline-none" value={state.practiceFormat} onChange={(e) => onChange({ practiceFormat: e.target.value })}>
+                    {PRACTICE_FORMATS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+
+      const renderLessonPlanCore = () => (
+        <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-5 mb-4">
+          <div className="flex items-center gap-2 mb-3 text-orange-800 font-semibold"><Zap size={18} /><h2>教學核心 (Core Strategy)</h2></div>
+          <div className="mb-4 flex flex-wrap gap-2">
+            <span className="text-sm text-slate-500 self-center mr-2">快速模板：</span>
+            {QUICK_TEMPLATES.map(t => (
+              <button key={t.id} onClick={() => handleTemplateClick(t.id)} className="px-3 py-1.5 text-xs font-medium bg-white border border-orange-200 text-orange-700 rounded-full hover:bg-orange-100 transition-colors shadow-sm">
+                ⚡ {t.label}
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">教學對象</label>
+              <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none" value={state.grade} onChange={(e) => onChange({ grade: e.target.value })}>
+                 <option value="">選擇年級</option>
+                 {Object.values(GradeLevel).map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+              <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white mt-2 text-sm focus:ring-orange-500 outline-none" value={state.studentLevel} onChange={(e) => onChange({ studentLevel: e.target.value })}>
+                 <option value="">選擇程度/班型</option>
+                 {Object.values(StudentLevel).map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">課程時長</label>
+              <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none" value={state.duration} onChange={(e) => onChange({ duration: e.target.value })}>
+                <option value="">選擇時長</option>
+                {DURATION_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              </select>
+              {state.chapter.includes('細胞') && !state.duration && <p className="text-xs text-green-600 mt-1">💡 AI 建議：此章節內容較多，建議安排 2-3 節課</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">教學法</label>
+              <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none" value={state.method} onChange={(e) => onChange({ method: e.target.value })}>
+                <option value="">選擇教學法</option>
+                {TEACHING_METHOD_GROUPS.map((group) => (
+                  <optgroup key={group.label} label={group.label}>
+                    {group.options.map((method) => <option key={method} value={method}>{method}</option>)}
+                  </optgroup>
+                ))}
+              </select>
+              {state.method === '自訂教學法' && (
+                <input type="text" placeholder="請輸入您想使用的教學法" className="w-full mt-2 rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none animate-fade-in" value={state.customMethod || ''} onChange={(e) => onChange({ customMethod: e.target.value })} />
+              )}
+            </div>
+          </div>
+           <div className="mt-4 border-t border-orange-200 pt-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2"><Layout size={16} className="text-orange-600"/> 教案主題 (Lesson Theme)</label>
+              <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none" value={state.lessonPlanTheme || ""} onChange={(e) => onChange({ lessonPlanTheme: e.target.value })}>
+                <option value="">請選擇教案主題</option>
+                {LESSON_PLAN_THEMES.map((group) => (
+                  <optgroup key={group.label} label={group.label}>
+                    {group.options.map((theme) => <option key={theme} value={theme}>{theme}</option>)}
+                  </optgroup>
+                ))}
+              </select>
+              {state.lessonPlanTheme === '自訂' && (
+                <input type="text" placeholder="請輸入您想要的教案主題..." className="w-full mt-2 rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none animate-fade-in" value={state.customLessonPlanTheme || ''} onChange={(e) => onChange({ customLessonPlanTheme: e.target.value })} />
+              )}
+           </div>
+        </div>
+      );
+
+      const renderQuestionCore = () => (
+        <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-5 mb-4">
+          <div className="flex items-center gap-2 mb-3 text-orange-800 font-semibold"><HelpCircle size={18} /><h2>題目設定 (Question Details)</h2></div>
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">1. 選擇題型 (可複選)</label>
+              <div className="space-y-3">
+                {QUESTION_TYPE_GROUPS.map((group) => (
+                  <div key={group.label} className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">{group.label}</div>
+                    <div className="flex flex-wrap gap-2">
+                      {group.options.map(type => {
+                        const isSelected = state.questionType.includes(type);
+                        return (
+                          <button key={type} onClick={() => toggleQuestionType(type)} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all border ${isSelected ? 'bg-orange-100 border-orange-400 text-orange-800' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}>
+                            {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
+                            {type}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {state.questionType.length === 0 && <p className="text-xs text-red-500 mt-2 flex items-center gap-1"><AlertCircle size={12} /> 請至少選擇一種題型</p>}
+            </div>
+            {state.questionType.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center gap-1"><SlidersHorizontal size={14} /> 2. 各題型詳細設定 (題數 & 難度)</label>
+                <div className="grid grid-cols-1 gap-3">
+                  {state.questionType.map(type => {
+                    const config = state.questionConfig?.[type] || { count: 3, difficulty: state.difficulty || '★★☆☆☆ 簡易應用 (公式/推論)' };
+                    return (
+                      <div key={type} className="bg-white border border-orange-200 rounded-lg p-3 shadow-sm flex flex-col md:flex-row md:items-center gap-3 animate-fade-in">
+                        <div className="flex items-center gap-2 min-w-[150px]"><span className="font-bold text-orange-700 text-sm">{type}</span></div>
+                        <div className="flex-1 flex items-center gap-2">
+                           <span className="text-xs text-slate-500 whitespace-nowrap">題數: {config.count}</span>
+                           <input type="range" min="1" max="20" className="w-full accent-orange-500 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer" value={config.count} onChange={(e) => updateQuestionConfig(type, 'count', parseInt(e.target.value))} />
+                        </div>
+                        <div className="flex-1">
+                           <select className="w-full text-xs rounded border-slate-300 border p-1.5 bg-slate-50 focus:ring-orange-500 outline-none" value={config.difficulty} onChange={(e) => updateQuestionConfig(type, 'difficulty', e.target.value)}>
+                             {Object.values(BloomLevel).map(v => <option key={v} value={v}>{v}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">3. 全卷解析程度</label>
+              <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none" value={state.explanationType} onChange={(e) => onChange({ explanationType: e.target.value })}>
+                {EXPLANATION_TYPES.map(opt => <option key={opt.label} value={opt.label}>{opt.label} - {opt.desc}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+      );
+
+      const renderSlidesCore = () => (
+        <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-5 mb-4">
+          <div className="flex items-center gap-2 mb-3 text-orange-800 font-semibold"><Presentation size={18} /><h2>簡報風格 (Presentation Style)</h2></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+               <div>
+                 <label className="block text-sm font-medium text-slate-700 mb-1">視覺風格</label>
+                 <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none" value={state.slideStyle} onChange={(e) => onChange({ slideStyle: e.target.value })}>
+                   <option value="">選擇風格</option>
+                   {Object.values(SlideStyle).map(v => <option key={v} value={v}>{v}</option>)}
+                 </select>
+               </div>
+               <div>
+                 <label className="block text-sm font-medium text-slate-700 mb-1">圖片來源</label>
+                 <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none" value={state.slideImageSource} onChange={(e) => onChange({ slideImageSource: e.target.value })}>
+                   {Object.values(SlideImageSource).map(v => <option key={v} value={v}>{v}</option>)}
+                 </select>
+               </div>
+               <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">簡報結構設定</label>
+                  <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none" value={state.slideStructure || ""} onChange={(e) => onChange({ slideStructure: e.target.value })}>
+                    <option value="">請選擇簡報結構</option>
+                    {SLIDE_STRUCTURES.map(struct => <option key={struct} value={struct}>{struct}</option>)}
+                  </select>
+                  {state.slideStructure === "自訂結構" && (
+                    <input type="text" placeholder="請輸入自訂結構" className="w-full mt-2 rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none animate-fade-in" value={state.customSlideStructure || ''} onChange={(e) => onChange({ customSlideStructure: e.target.value })} />
+                  )}
+               </div>
+               <div>
+                 <label className="block text-sm font-medium text-slate-700 mb-1">視覺元素密度</label>
+                 <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-orange-500 outline-none" value={state.visualDensity || ""} onChange={(e) => onChange({ visualDensity: e.target.value })}>
+                   <option value="">請選擇密度</option>
+                   {VISUAL_DENSITIES.map(v => <option key={v} value={v}>{v}</option>)}
+                 </select>
+               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">投影片張數 (Slider): <span className="text-orange-600 font-bold text-lg">{state.slideCount}</span> 張</label>
+              <input type="range" min="3" max="20" className="w-full accent-orange-500 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" value={state.slideCount} onChange={(e) => onChange({ slideCount: parseInt(e.target.value) })} />
+              <div className="flex justify-between text-xs text-slate-500 mt-1"><span>3</span><span>12 (建議)</span><span>20</span></div>
+            </div>
+          </div>
+        </div>
+      );
+
+      const renderInfographicCore = () => (
+        <div className="bg-pink-50/50 border border-pink-100 rounded-xl p-5 mb-4">
+          <div className="flex items-center gap-2 mb-3 text-pink-800 font-semibold"><Image size={18} /><h2>資訊圖表風格 (Infographic Style)</h2></div>
+          <div className="space-y-4">
+             <div>
+               <label className="block text-sm font-medium text-slate-700 mb-1">視覺風格選擇</label>
+               <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-pink-500 outline-none" value={state.infographicStyle} onChange={(e) => onChange({ infographicStyle: e.target.value })}>
+                 <option value="">不指定 (Default)</option>
+                 {Object.values(InfographicStyle).map(v => <option key={v} value={v}>{v}</option>)}
+               </select>
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                   <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-1"><Layout size={14} /> 圖表類型 (Layout)</label>
+                   <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-pink-500 outline-none text-sm" value={state.infographicLayout || ""} onChange={(e) => onChange({ infographicLayout: e.target.value })}>
+                     <option value="">不指定 (Default)</option>
+                     {INFOGRAPHIC_LAYOUT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                   </select>
+                </div>
+                 <div>
+                   <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-1"><Layers size={14} /> 資訊密度 (Density)</label>
+                   <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-pink-500 outline-none text-sm" value={state.infographicDensity || ""} onChange={(e) => onChange({ infographicDensity: e.target.value })}>
+                     <option value="">不指定 (Default)</option>
+                     {INFOGRAPHIC_DENSITY_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                   </select>
+                </div>
+                <div>
+                   <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-1"><Eye size={14} /> 視覺層次 (Hierarchy)</label>
+                   <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-pink-500 outline-none text-sm" value={state.infographicHierarchy || ""} onChange={(e) => onChange({ infographicHierarchy: e.target.value })}>
+                     <option value="">不指定 (Default)</option>
+                     {INFOGRAPHIC_HIERARCHY_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                   </select>
+                </div>
+                 <div>
+                   <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-1"><Palette size={14} /> 色彩策略 (Color)</label>
+                   <select className="w-full rounded-lg border-slate-300 border p-2.5 bg-white focus:ring-pink-500 outline-none text-sm" value={state.infographicColor || ""} onChange={(e) => onChange({ infographicColor: e.target.value })}>
+                     <option value="">不指定 (Default)</option>
+                     {INFOGRAPHIC_COLOR_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                   </select>
+                </div>
+             </div>
+          </div>
+        </div>
+      );
+
+      const renderCustomRequirements = () => (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-4">
+          <div className="flex items-center gap-2 mb-3 text-slate-700 font-semibold"><MessageSquarePlus size={18} /><h2>自定義需求 (Custom Requirements)</h2></div>
+          <textarea className="w-full h-24 rounded-lg border-slate-300 border p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none bg-white placeholder-slate-400" placeholder="請輸入任何額外的特殊要求，例如：希望語氣更幽默、加入時事梗..." value={state.customRequirements || ''} onChange={(e) => onChange({ customRequirements: e.target.value })} />
+        </div>
+      );
+
+      const renderAdvancedSection = () => (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden">
+          <button className="w-full p-4 flex items-center justify-between text-slate-600 hover:bg-slate-100 transition-colors" onClick={() => setShowAdvanced(!showAdvanced)}>
+            <span className="font-semibold flex items-center gap-2"><Settings size={16} /> 進階設定 (課綱對應 & 差異化)</span>
+            {showAdvanced ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          {showAdvanced && (
+            <div className="p-5 border-t border-slate-200 bg-white">
+               <div className="mb-4">
+                 <label className="block text-base font-bold text-slate-800 mb-4">108 課綱能力指標 (自然領綱)</label>
+                 <div className="space-y-6">
+                    {CURRICULUM_INDICATOR_GROUPS.map((group) => (
+                      <div key={group.label} className="border border-slate-100 rounded-lg p-3 bg-slate-50/50">
+                        <h4 className="font-semibold text-slate-700 mb-3 border-b border-slate-200 pb-2 flex items-center gap-2 text-sm">{group.label}</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {group.options.map(item => (
+                            <label key={item.id} className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer relative overflow-hidden group ${state.curriculumIndicators.includes(item.id) ? 'bg-blue-50 border-blue-200 shadow-sm' : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-sm'}`}>
+                              <div className="pt-0.5">
+                                <input type="checkbox" className="w-4 h-4 accent-blue-600 rounded cursor-pointer" checked={state.curriculumIndicators.includes(item.id)} onChange={(e) => {
+                                    const newSet = e.target.checked ? [...state.curriculumIndicators, item.id] : state.curriculumIndicators.filter(i => i !== item.id);
+                                    onChange({ curriculumIndicators: newSet });
+                                  }} />
+                              </div>
+                              <div className="flex-1">
+                                <div className="font-bold text-sm text-slate-800 mb-0.5">{item.id}</div>
+                                <div className="text-xs text-slate-500 leading-relaxed">{item.desc}</div>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                 </div>
+               </div>
+            </div>
+          )}
+        </div>
+      );
+
+      return (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          {renderBasicSection()}
+          {type === ModuleType.LESSON_PLAN && renderLessonPlanCore()}
+          {type === ModuleType.QUESTION && renderQuestionCore()}
+          {type === ModuleType.SLIDES && renderSlidesCore()}
+          {type === ModuleType.MATERIALS && renderMaterialsCore()}
+          {type === ModuleType.INFOGRAPHIC && renderInfographicCore()}
+          {renderCustomRequirements()}
+          {renderAdvancedSection()}
+          <div className="mt-8 flex justify-end">
+            <div className="relative group">
+              <button onClick={onGenerate} disabled={!isFormValid || isGenerating} className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-lg shadow-lg transition-all ${!isFormValid ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-95'}`}>
+                 {isGenerating ? (<><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> 處理中...</>) : (<><Wand2 size={20} /> 生成提示詞 (Generate Prompt)</>)}
+              </button>
+              {!isFormValid && (
+                 <div className="absolute bottom-full right-0 mb-2 w-max px-3 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                   請填寫必填欄位 (冊次、章節)
+                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 6. 主程式 App ---
+    function App() {
+      const [activeTab, setActiveTab] = useState(ModuleType.LESSON_PLAN);
+      const [formData, setFormData] = useState(INITIAL_STATE);
+      const [result, setResult] = useState("");
+      const [isGenerating, setIsGenerating] = useState(false);
+      const [copyStatus, setCopyStatus] = useState('idle');
+
+      const handleUpdateState = (updates) => { setFormData(prev => ({ ...prev, ...updates })); };
+
+      // 完全同步 App.tsx 裡的 Prompt 組裝邏輯
+      const constructPrompt = () => {
+        let prompt = `【角色設定】\n你是一位擁有 10 年以上教學經驗的台灣高中生物教師。請根據我上傳的來源資料（課本或講義），針對「${formData.chapter || "指定單元"}」，協助我生成教學內容。\n\n`;
+
+        if (activeTab === ModuleType.LESSON_PLAN) {
+          const displayedMethod = formData.method === '自訂教學法' ? formData.customMethod : formData.method;
+          const displayedTheme = formData.lessonPlanTheme === '自訂' ? formData.customLessonPlanTheme : formData.lessonPlanTheme;
+
+          prompt += `【任務：撰寫教案】\n請根據來源資料，設計一份適合「${formData.studentLevel}」的教案。\n\n**教案參數**：\n- 對象：${formData.grade}\n- 時間：${formData.duration}\n- 教學法：${displayedMethod}\n`;
+          if (displayedTheme) prompt += `- 主題：${displayedTheme}\n`;
+          if (formData.curriculumIndicators.length > 0) prompt += `- 課綱指標：${formData.curriculumIndicators.join(', ')}\n`;
+          
+          prompt += `\n**輸出要求**：\n1. 結構須包含：教學目標、核心素養、詳細流程（引起動機→發展活動→綜合活動）、評量方式。\n2. 請特別註明在「發展活動」中，如何具體運用「${displayedMethod}」來引導學生。\n`;
+
+        } else if (activeTab === ModuleType.QUESTION) {
+          const qTypes = formData.questionType;
+          const totalCount = qTypes.reduce((acc, type) => acc + (formData.questionConfig[type]?.count || 0), 0);
+          
+          prompt += `【任務：設計混合試題】\n請根據來源資料，出一份總共約 ${totalCount} 題的測驗卷。\n\n**題型規格**：\n`;
+          qTypes.forEach((type) => {
+            const config = formData.questionConfig[type] || { count: 3, difficulty: formData.difficulty };
+            prompt += `- ${type}：${config.count} 題 (難度：${config.difficulty})\n`;
+          });
+          
+          prompt += `\n**輸出要求**：\n1. **素養導向**：題目須結合生活情境或科學探究情境，避免純記憶性問答。\n2. **完整解析**：請針對「${formData.explanationType}」的需求，提供正確答案與解析。\n3. **格式**：請依題型分類，並以 Markdown 格式輸出。\n`;
+
+        } else if (activeTab === ModuleType.SLIDES) {
+          const structure = formData.slideStructure === "自訂結構" && formData.customSlideStructure ? formData.customSlideStructure : formData.slideStructure;
+
+          prompt += `【任務：製作簡報草稿】\n請根據來源資料中「${formData.chapter}」的內容，為「${formData.studentLevel}」的學生規劃一份簡報大綱。\n\n**簡報規格**：\n- 總頁數：約 ${formData.slideCount} 頁\n- 結構邏輯：${structure}\n- 內容風格：${formData.slideStyle} (請依此風格設定標題語氣與內容取捨)\n- 視覺密度：${formData.visualDensity}\n`;
+          prompt += `\n**輸出格式 (請依序條列每一頁)**：\n**Page [頁碼]：[標題]**\n- **核心觀念**：請列出 3-5 點關鍵內容 (Bullet points)，文字須精簡。\n- **講師備忘稿**：說明此頁應講解的觀念細節或舉例。\n- **配圖建議**：描述適合放在此頁的圖表類型或圖片內容 (例如：細胞構造圖、流程圖)。\n`;
+
+        } else if (activeTab === ModuleType.INFOGRAPHIC) {
+          prompt += `【任務：設計資訊圖表 (Infographic)】\n請根據來源資料，將「${formData.chapter}」中的關鍵概念轉化為一張資訊圖表的設計企劃案。\n\n**設計參數**：\n- 視覺風格：${formData.infographicStyle || "專業清晰"}\n`;
+          
+          if (formData.infographicLayout) {
+             const opt = INFOGRAPHIC_LAYOUT_OPTIONS.find(o => o.value === formData.infographicLayout);
+             if (opt) prompt += `- 結構佈局：${opt.label} (${opt.keywords})\n`;
+          }
+          if (formData.infographicDensity) {
+             const opt = INFOGRAPHIC_DENSITY_OPTIONS.find(o => o.value === formData.infographicDensity);
+             if (opt) prompt += `- 資訊密度：${opt.label}\n`;
+          }
+          if (formData.infographicHierarchy) {
+             const opt = INFOGRAPHIC_HIERARCHY_OPTIONS.find(o => o.value === formData.infographicHierarchy);
+             if (opt) prompt += `- 視覺層次：${opt.label}\n`;
+          }
+          if (formData.infographicColor) {
+             const opt = INFOGRAPHIC_COLOR_OPTIONS.find(o => o.value === formData.infographicColor);
+             if (opt) prompt += `- 配色建議：${opt.label}\n`;
+          }
+
+          prompt += `\n**輸出內容**：\n1. **圖表標題**：一個吸睛且明確的主標題。\n2. **核心視覺結構**：文字描述圖表的中央圖像或動線安排 (例如：以時間軸呈現演化過程，或是以中心輻射圖呈現細胞功能)。\n3. **關鍵資訊點**：列出圖表上必須標註的 3-5 個關鍵數據、專有名詞或簡短說明文字。\n4. **設計理念**：簡述為何採用此佈局有助於學生理解此單元。\n`;
+          
+        } else {
+          prompt += `【任務：製作補充教材】\n請根據來源資料，製作一份適合高中生的${formData.enableMaterialStyle ? `「${formData.materialStyle}」` : '補充教材'}。\n\n**規格設定**：\n`;
+          if (formData.enableMaterialDifficulty) prompt += `- 難度：${formData.materialDifficulty}\n`;
+          if (formData.enableMaterialLength) prompt += `- 份量：${formData.materialLength}\n`;
+          if (formData.enableMaterialSource && formData.materialSource.length > 0) prompt += `- 參考重點：${formData.materialSource.join('、')}\n`;
+
+          prompt += `\n**內容要求**：\n`;
+          if (formData.enableKeywords) prompt += `1. **關鍵名詞**：請依「${formData.keywordsFormat}」格式解釋重要名詞${formData.customKeywords ? ` (包含：${formData.customKeywords})` : ''}。\n`;
+          if (formData.enableTables) prompt += `2. **表格整理**：請製作一個「${formData.tablesFormat}」來比較易混淆觀念。\n`;
+          if (formData.enableExamples) prompt += `3. **例題講解**：提供 3 題「${formData.examplesFormat}」。\n`;
+          if (formData.enablePractice) prompt += `4. **課後練習**：提供 3 題「${formData.practiceFormat}」。\n`;
+        }
+
+        if (formData.customRequirements && formData.customRequirements.trim() !== '') {
+            prompt += `\n**特殊需求**：\n${formData.customRequirements}\n`;
+        }
+        return prompt;
+      };
+
+      const handleGenerate = () => {
+        setIsGenerating(true);
+        setCopyStatus('idle');
+        setTimeout(() => {
+            const userPrompt = constructPrompt();
+            setResult(userPrompt);
+            setIsGenerating(false);
+            setTimeout(() => { document.getElementById('result-area')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+        }, 500); // 模擬 App.tsx 中的 500ms 體驗延遲
+      };
+
+      const handleCopy = async () => {
+        if (!result) return;
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+              await navigator.clipboard.writeText(result);
+          } else {
+              let textArea = document.createElement("textarea");
+              textArea.value = result;
+              textArea.style.position = "fixed";
+              textArea.style.left = "-999999px";
+              document.body.appendChild(textArea);
+              textArea.focus();
+              textArea.select();
+              document.execCommand('copy');
+              textArea.remove();
+          }
+          setCopyStatus('copied');
+          setTimeout(() => setCopyStatus('idle'), 2000);
+        } catch (err) {
+          console.error("Failed to copy text: ", err);
+          alert("複製失敗，請手動全選複製。");
+        }
+      };
+
+      return (
+        <div className="min-h-screen pb-12 font-sans text-slate-800">
+          <header className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                 <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-md">Bio</div>
+                 <h1 className="text-xl font-bold text-slate-800 tracking-wide">高中生物提示詞生成平台</h1>
+              </div>
+              <div className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full hidden sm:block">
+                Ver 2.9 (NotebookLM Optimized HTML)
+              </div>
+            </div>
+          </header>
+
+          <main className="max-w-7xl mx-auto px-4 py-8">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-7 text-white mb-8 shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 opacity-10"><Boxes size={200} /></div>
+              <div className="relative z-10">
+                <h2 className="text-2xl font-bold mb-3 flex items-center gap-2"><Check size={28}/> AI 結構化提示詞生成助手</h2>
+                <p className="opacity-90 max-w-2xl leading-relaxed text-sm">
+                  此平台專為生成高品質的「結構化 Prompt」設計。我們將您的教學需求轉化為 AI 能夠精準理解的專業指令。
+                  一鍵生成後，請複製貼上至 <strong>NotebookLM</strong> (推薦) 或 Google Gemini，即可獲得最精準的教學內容。
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-8 space-y-6">
+                <div className="flex space-x-1 overflow-x-auto pb-2 border-b-2 border-slate-200 custom-scrollbar">
+                  {TAB_CONFIG.map(tab => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-5 py-3.5 text-sm font-semibold rounded-t-xl transition-all whitespace-nowrap transform ${isActive ? 'bg-white border-b-2 border-blue-500 text-blue-600 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] translate-y-[2px]' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'}`}>
+                        <Icon size={18} className={isActive ? tab.color : ''} />{tab.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <GeneratorForm type={activeTab} state={formData} onChange={handleUpdateState} onGenerate={handleGenerate} isGenerating={isGenerating} />
+
+                {result && (
+                  <div id="result-area" className="space-y-4 animate-fade-in pt-4">
+                     <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 bg-gradient-to-l from-slate-800 to-transparent w-full h-16 pointer-events-none"></div>
+                        <div className="flex items-center justify-between mb-4 border-b border-slate-700 pb-4 relative z-10">
+                          <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]"></span>
+                            已優化的結構化提示詞 (Structured Prompt)
+                          </h3>
+                          <button onClick={handleCopy} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${copyStatus === 'copied' ? 'bg-green-500 text-white shadow-md' : 'bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white shadow-md'}`}>
+                            {copyStatus === 'copied' ? <><Check size={16} /> 已複製！</> : <><Copy size={16} /> 複製提示詞</>}
+                          </button>
+                        </div>
+                        <div className="font-mono text-sm md:text-base leading-relaxed text-slate-300 whitespace-pre-wrap break-words max-h-[500px] overflow-y-auto pr-2 custom-scrollbar select-all">
+                          {result}
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm text-slate-400 gap-3">
+                          <span className="flex items-center gap-2"><Info size={16}/> 下一步：點擊右上角複製，並貼入 NotebookLM 對話框</span>
+                          <a href="https://notebooklm.google.com/" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors font-medium bg-blue-500/10 px-3 py-1.5 rounded-full">
+                            前往 NotebookLM <ExternalLink size={14} />
+                          </a>
+                        </div>
+                     </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="lg:col-span-4">
+                 <div className="space-y-6 lg:space-y-0 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:flex lg:flex-col gap-6">
+                  <div className="lg:flex-none">
+                     <PreviewPanel state={formData} />
+                  </div>
+                  <div className="lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:custom-scrollbar lg:pb-4">
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-5 shadow-sm">
+                      <h4 className="font-bold text-blue-800 mb-2 flex items-center gap-2">🚀 高效使用指南</h4>
+                      <ol className="text-sm text-blue-800/80 list-decimal pl-4 space-y-3">
+                        <li><strong>參數設定</strong>：在左側選單選擇冊次與章節，這會決定 AI 的知識範圍。</li>
+                        <li><strong>混合題組</strong>：現在支援<strong>複選題型</strong>，並可針對每個題型單獨設定「題數」與「難度」，AI 將為您生成完美的混合試卷。</li>
+                        <li><strong>生成提示詞</strong>：系統會自動將您的選項轉化為「角色設定」與「深度指令」。</li>
+                        <li><strong>複製並執行</strong>：
+                          <ul className="list-disc pl-4 mt-1 text-xs opacity-90">
+                            <li>推薦貼入 <strong>NotebookLM</strong> 並上傳課本 PDF，以獲得最精準的題目與簡報內容。</li>
+                          </ul>
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

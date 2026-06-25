@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 輔助出題改題解題 ── 提示詞速查工具</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f3;
+    --accent: #c0392b;
+    --accent2: #2980b9;
+    --accent3: #16a085;
+    --accent4: #8e44ad;
+    --accent5: #e67e22;
+    --accent6: #27ae60;
+    --gold: #d4af37;
+    --muted: #7f8c8d;
+    --border: #e0d9cc;
+    --card: #ffffff;
+    --highlight: #fff9e6;
+    --tag-bg: #f0f0f0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: white;
+    padding: 28px 40px 24px;
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 3px solid var(--gold);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .header-left h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.7rem; font-weight: 900;
+    letter-spacing: .05em;
+  }
+  .header-left p {
+    font-size: .8rem; color: #aaa; margin-top: 3px;
+    letter-spacing: .08em;
+  }
+  .school-badge {
+    font-size: .75rem; color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 4px 10px; border-radius: 20px;
+    letter-spacing: .05em;
+  }
+
+  /* ── SEARCH BAR ── */
+  .search-bar {
+    background: #fff;
+    border-bottom: 2px solid var(--border);
+    padding: 16px 40px;
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  #searchInput {
+    flex: 1; min-width: 200px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: .95rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    outline: none;
+    transition: border-color .2s;
+  }
+  #searchInput:focus { border-color: var(--accent2); }
+  .filter-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    border: 2px solid var(--border);
+    background: white;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: .82rem;
+    cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .filter-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--highlight);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 40px;
+    font-size: .82rem; color: var(--muted);
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+  }
+  .stat-item strong { color: var(--ink); font-weight: 700; }
+
+  /* ── MAIN LAYOUT ── */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: calc(100vh - 180px);
+  }
+
+  /* ── SIDEBAR ── */
+  aside {
+    border-right: 2px solid var(--border);
+    padding: 24px 0;
+    background: #f5f3ee;
+    position: sticky; top: 180px; align-self: start;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+  }
+  .sidebar-section h3 {
+    font-size: .72rem; font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--muted);
+    padding: 8px 20px 6px;
+    text-transform: uppercase;
+  }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 20px;
+    font-size: .87rem;
+    cursor: pointer;
+    color: var(--ink);
+    transition: background .12s, color .12s;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+  }
+  .sidebar-link:hover { background: #eceae4; border-left-color: var(--accent2); color: var(--accent2); }
+  .sidebar-link.active { background: #e4e1d8; border-left-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .sidebar-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .count-badge {
+    margin-left: auto;
+    background: var(--border);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: .72rem;
+    color: var(--muted);
+  }
+
+  /* ── CONTENT ── */
+  main { padding: 32px 40px 60px; }
+
+  .section-header {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 20px; margin-top: 36px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-header:first-child { margin-top: 0; }
+  .section-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.25rem; font-weight: 900;
+    color: var(--ink);
+  }
+  .section-subtitle { font-size: .8rem; color: var(--muted); }
+  .section-icon { font-size: 1.4rem; }
+
+  /* ── CARDS ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 18px;
+    margin-bottom: 8px;
+  }
+
+  .prompt-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow .2s, transform .1s;
+    display: flex; flex-direction: column;
+  }
+  .prompt-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,.09);
+    transform: translateY(-1px);
+  }
+  .card-top {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .card-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+  .card-title {
+    font-weight: 700; font-size: .95rem;
+    color: var(--ink); line-height: 1.3;
+  }
+  .card-label {
+    font-size: .7rem; margin-top: 4px; color: var(--muted);
+  }
+  .card-tags {
+    display: flex; flex-wrap: wrap; gap: 5px;
+    margin-top: 6px;
+  }
+  .tag {
+    font-size: .68rem;
+    background: var(--tag-bg);
+    border-radius: 4px;
+    padding: 2px 7px;
+    color: #555;
+  }
+  .tag.tool { background: #e8f4fd; color: var(--accent2); }
+  .tag.level { background: #fef9e7; color: #b7950b; }
+  .tag.type { background: #f9ebea; color: var(--accent); }
+
+  .card-body {
+    padding: 14px 16px;
+    flex: 1;
+  }
+  .prompt-text {
+    font-size: .85rem;
+    line-height: 1.8;
+    color: #333;
+    background: #f8f7f4;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: 'Noto Sans TC', sans-serif;
+    max-height: 180px;
+    overflow-y: auto;
+    cursor: text;
+    user-select: text;
+  }
+  .prompt-hint {
+    font-size: .78rem; color: var(--muted);
+    margin-top: 8px; line-height: 1.5;
+  }
+  .prompt-hint strong { color: var(--accent5); }
+
+  .card-foot {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 8px; justify-content: flex-end;
+    background: #fdfdfc;
+  }
+  .btn {
+    border: none; border-radius: 6px;
+    padding: 7px 14px;
+    font-size: .78rem;
+    cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 500;
+    transition: all .15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .btn-copy {
+    background: var(--ink); color: white;
+  }
+  .btn-copy:hover { background: #333; }
+  .btn-copy.copied { background: var(--accent3); }
+  .btn-expand {
+    background: var(--border); color: var(--ink);
+  }
+  .btn-expand:hover { background: #ccc; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 999;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 12px;
+    max-width: 700px; width: 100%;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  }
+  .modal-head {
+    padding: 20px 24px;
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .modal-head h2 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.1rem; font-weight: 900;
+    flex: 1;
+  }
+  .modal-close {
+    background: none; border: none; font-size: 1.4rem;
+    cursor: pointer; color: var(--muted);
+    transition: color .15s;
+  }
+  .modal-close:hover { color: var(--ink); }
+  .modal-body {
+    padding: 20px 24px;
+    overflow-y: auto; flex: 1;
+  }
+  .modal-prompt {
+    font-size: .9rem; line-height: 1.9;
+    color: #222;
+    background: #f8f7f4;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    user-select: text;
+  }
+  .modal-foot {
+    padding: 14px 24px;
+    border-top: 2px solid var(--border);
+    display: flex; gap: 10px; justify-content: flex-end;
+  }
+  .btn-modal-copy {
+    background: var(--ink); color: white;
+    padding: 10px 20px; font-size: .88rem;
+  }
+
+  /* ── TIPS BOX ── */
+  .tips-box {
+    background: var(--highlight);
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    font-size: .84rem; line-height: 1.75;
+    color: #555;
+  }
+  .tips-box h4 {
+    font-weight: 700; color: var(--ink);
+    margin-bottom: 8px; font-size: .9rem;
+  }
+  .tips-box ul { padding-left: 18px; }
+  .tips-box li { margin-bottom: 4px; }
+  .tips-box code {
+    background: #f0e8c0; padding: 1px 5px; border-radius: 3px;
+    font-family: monospace; font-size: .82rem;
+    color: #7d5a00;
+  }
+
+  /* ── NO RESULT ── */
+  .no-result {
+    text-align: center; padding: 60px 20px;
+    color: var(--muted); font-size: .9rem;
+  }
+  .no-result .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); color: #aaa;
+    text-align: center; padding: 18px;
+    font-size: .78rem; letter-spacing: .05em;
+  }
+  footer strong { color: var(--gold); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f0ede6; }
+  ::-webkit-scrollbar-thumb { background: #c0b8a8; border-radius: 3px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    .main-layout { grid-template-columns: 1fr; }
+    aside { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    header, .search-bar, .stats-bar, main { padding-left: 20px; padding-right: 20px; }
+  }
+
+  /* ── VISIBLE / HIDDEN ── */
+  .prompt-section { }
+  .prompt-section.hidden { display: none; }
+  .prompt-card.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <h1>🎯 AI 輔助出題・改題・解題</h1>
+    <p>提示詞速查工具 ── 教師研習專用版 v2.0</p>
+  </div>
+  <div class="school-badge">臺北市立麗山高中 · 林獻升老師</div>
+</header>
+
+<!-- SEARCH BAR -->
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="🔍 搜尋關鍵字，例如：閱讀測驗、多選、改題…">
+  <div class="filter-btns">
+    <button class="filter-btn active" data-filter="all">全部</button>
+    <button class="filter-btn" data-filter="出題">✏️ 出題</button>
+    <button class="filter-btn" data-filter="改題">🔧 改題</button>
+    <button class="filter-btn" data-filter="解題">💡 解題</button>
+    <button class="filter-btn" data-filter="閱讀">📖 閱讀測驗</button>
+    <button class="filter-btn" data-filter="進階">🚀 進階技巧</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <span>共 <strong id="totalCount">0</strong> 組提示詞</span>
+  <span>目前顯示：<strong id="showCount">0</strong> 組</span>
+  <span>點擊「複製」即可貼到 ChatGPT / Claude / Gemini</span>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="sidebar-section">
+      <h3>快速跳轉</h3>
+      <a class="sidebar-link active" href="#sec-basic-gen" onclick="scrollTo(this)">
+        <span class="sidebar-dot" style="background:#c0392b"></span> 基礎出題
+        <span class="count-badge" id="cnt-basic-gen">-</span>
+      </a>
+      <a class="sidebar-link" href="#sec-reading" onclick="scrollTo(this)">
+        <span class="sidebar-dot" style="background:#2980b9"></span> 閱讀測驗出題
+        <span class="count-badge" id="cnt-reading">-</span>
+      </a>
+      <a class="sidebar-link" href="#sec-modify" onclick="scrollTo(this)">
+        <span class="sidebar-dot" style="background:#16a085"></span> 改題技巧
+        <span class="count-badge" id="cnt-modify">-</span>
+      </a>
+      <a class="sidebar-link" href="#sec-solve" onclick="scrollTo(this)">
+        <span class="sidebar-dot" style="background:#8e44ad"></span> 解題解答
+        <span class="count-badge" id="cnt-solve">-</span>
+      </a>
+      <a class="sidebar-link" href="#sec-analysis" onclick="scrollTo(this)">
+        <span class="sidebar-dot" style="background:#e67e22"></span> 考卷分析
+        <span class="count-badge" id="cnt-analysis">-</span>
+      </a>
+      <a class="sidebar-link" href="#sec-notebooklm" onclick="scrollTo(this)">
+        <span class="sidebar-dot" style="background:#27ae60"></span> NotebookLM
+        <span class="count-badge" id="cnt-notebooklm">-</span>
+      </a>
+      <a class="sidebar-link" href="#sec-advanced" onclick="scrollTo(this)">
+        <span class="sidebar-dot" style="background:#d4af37"></span> 進階技巧
+        <span class="count-badge" id="cnt-advanced">-</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="mainContent">
+
+    <!-- TIPS BOX -->
+    <div class="tips-box">
+      <h4>💡 使用說明</h4>
+      <ul>
+        <li>點擊 <strong>「複製提示詞」</strong> 後，直接貼到 ChatGPT / Claude / Gemini 使用</li>
+        <li>提示詞中 <code>【範圍】</code>、<code>【題目數量】</code> 等括號請自行替換成實際內容</li>
+        <li>使用搜尋框或上方篩選鈕快速找到需要的提示詞</li>
+        <li>點擊 <strong>「展開查看」</strong> 可在彈窗中完整閱讀長提示詞</li>
+        <li>建議搭配 <strong>ChatGPT 專案</strong> 或 <strong>Claude 專案</strong> 建立知識庫，效果更佳</li>
+      </ul>
+    </div>
+
+    <!-- ── SECTION 1: 基礎出題 ── -->
+    <div class="prompt-section" id="sec-basic-gen" data-section="出題">
+      <div class="section-header">
+        <span class="section-icon">✏️</span>
+        <span class="section-title">基礎出題</span>
+        <span class="section-subtitle">依主題、範圍、難度生成考題</span>
+      </div>
+      <div class="card-grid" id="grid-basic-gen"></div>
+    </div>
+
+    <!-- ── SECTION 2: 閱讀測驗出題 ── -->
+    <div class="prompt-section" id="sec-reading" data-section="閱讀">
+      <div class="section-header">
+        <span class="section-icon">📖</span>
+        <span class="section-title">閱讀測驗出題</span>
+        <span class="section-subtitle">從文章、影片、課文自動生成閱讀測驗</span>
+      </div>
+      <div class="card-grid" id="grid-reading"></div>
+    </div>
+
+    <!-- ── SECTION 3: 改題技巧 ── -->
+    <div class="prompt-section" id="sec-modify" data-section="改題">
+      <div class="section-header">
+        <span class="section-icon">🔧</span>
+        <span class="section-title">改題技巧</span>
+        <span class="section-subtitle">題型轉換、難度調整、選項修改</span>
+      </div>
+      <div class="card-grid" id="grid-modify"></div>
+    </div>
+
+    <!-- ── SECTION 4: 解題解答 ── -->
+    <div class="prompt-section" id="sec-solve" data-section="解題">
+      <div class="section-header">
+        <span class="section-icon">💡</span>
+        <span class="section-title">解題解答</span>
+        <span class="section-subtitle">AI 扮演專業教師，詳解每一題選項</span>
+      </div>
+      <div class="card-grid" id="grid-solve"></div>
+    </div>
+
+    <!-- ── SECTION 5: 考卷分析 ── -->
+    <div class="prompt-section" id="sec-analysis" data-section="解題">
+      <div class="section-header">
+        <span class="section-icon">📊</span>
+        <span class="section-title">考卷整體分析</span>
+        <span class="section-subtitle">命題重點、學生準備方向、考試特點解析</span>
+      </div>
+      <div class="card-grid" id="grid-analysis"></div>
+    </div>
+
+    <!-- ── SECTION 6: NotebookLM ── -->
+    <div class="prompt-section" id="sec-notebooklm" data-section="進階">
+      <div class="section-header">
+        <span class="section-icon">📓</span>
+        <span class="section-title">NotebookLM 專屬提示詞</span>
+        <span class="section-subtitle">教材知識庫 + 解題簡報 + 資訊圖生成</span>
+      </div>
+      <div class="card-grid" id="grid-notebooklm"></div>
+    </div>
+
+    <!-- ── SECTION 7: 進階技巧 ── -->
+    <div class="prompt-section" id="sec-advanced" data-section="進階">
+      <div class="section-header">
+        <span class="section-icon">🚀</span>
+        <span class="section-title">進階技巧 ── 角色扮演・知識庫・特殊格式</span>
+        <span class="section-subtitle">讓 AI 成為你的專屬命題助理</span>
+      </div>
+      <div class="card-grid" id="grid-advanced"></div>
+    </div>
+
+    <!-- NO RESULT -->
+    <div class="no-result" id="noResult" style="display:none">
+      <span class="emoji">🔍</span>
+      找不到符合的提示詞，請換個關鍵字試試
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <span id="modalIcon" style="font-size:1.4rem"></span>
+      <h2 id="modalTitle"></h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="prompt-text modal-prompt" id="modalBody"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-modal-copy btn-copy" id="modalCopyBtn" onclick="copyModal()">
+        📋 複製提示詞
+      </button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <strong>AI 輔助出題・改題・解題 提示詞速查工具</strong> ── 臺北市立麗山高中 教師研習版 · 2025
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const PROMPTS = [
+
+  // ── 基礎出題 ──────────────────────────────────
+  {
+    section: 'basic-gen', filter: '出題',
+    icon: '📝', title: '標準生物考卷出題',
+    label: '單選 + 多選題組', tags: ['出題','生物','單選','多選'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `我是台灣高中生物老師，請依照以下規格出一份考題：
+・單選題 20 題（每題 5 個選項 A～E，答案只有 1 個）
+・多選題 20 題（每題 5 個選項，正確答案 2～4 個）
+
+考試範圍：【請填入章節，例如：細胞構造與功能】
+難度要求：記憶題 40%、理解題 40%、分析應用題 20%
+語言：全部繁體中文
+請為每一題提供：標準答案、每個選項的詳細解釋（正確或錯誤原因）`,
+    hint: '將「考試範圍」替換成實際章節後貼入 AI 即可生成完整試卷'
+  },
+  {
+    section: 'basic-gen', filter: '出題',
+    icon: '🎯', title: '學測素養導向出題',
+    label: '108課綱 · 情境題', tags: ['出題','學測','素養','情境'],
+    tools: ['Claude','ChatGPT'],
+    prompt: `我是台灣高中生物老師，請依 108 課綱學測規範，設計素養導向考題：
+
+題型：
+・情境式單選題 5 題（每題 5 個選項，附有 100～200 字情境描述）
+・情境式多選題 3 題（每題 5 個選項，答案 2～4 個）
+・非選擇題（問答）2 題（每小題配分請一併標示）
+
+要求：
+1. 情境取材自生活、科學新聞或實驗數據
+2. 不得出現「下列何者正確/錯誤」等直白問法
+3. 考題章節範圍：【請填入範圍】
+4. 請附完整解析與評分要點`,
+    hint: '學測命題規範：5選1或多選（2～4個），情境不可超出課綱範圍'
+  },
+  {
+    section: 'basic-gen', filter: '出題',
+    icon: '🔬', title: '依課程內容（貼入教材文字）出題',
+    label: '從教材直接命題', tags: ['出題','教材','課文','實驗'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `以下是我的高中生物教材內容（見附件或下方貼入文字）。
+請依照此教材，出一份包含以下內容的考卷：
+・單選題 10 題（每題 5 個選項）
+・多選題 5 題（每題 5 個選項，答案 2～4 個）
+・實驗操作題 2 題（問答格式，測試操作步驟與結果分析能力）
+
+命題原則：
+・考題難度需涵蓋記憶、理解、分析三層次
+・選項中需設計常見迷思概念作為干擾選項
+・每題附標準答案與詳解
+・所有文字使用繁體中文`,
+    hint: '貼入教材文字或上傳PDF後再送出此提示詞效果最好'
+  },
+  {
+    section: 'basic-gen', filter: '出題',
+    icon: '📐', title: 'Kahoot / Wayground 快速出題格式',
+    label: '互動評量平台', tags: ['出題','Kahoot','Wayground','互動'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `我要在 Kahoot / Wayground 上使用，請幫我出 15 題競賽風格的生物選擇題：
+
+格式要求：
+・每題 1 個正確答案、3 個干擾選項（共 4 個選項）
+・題目字數不超過 80 字
+・選項字數每個不超過 25 字
+・難度由易到難排列
+・最後 3 題設計難度較高（鑑別度高）
+
+主題：【請填入主題，例如：細胞分裂與染色體】
+請附每題答案及簡短說明（50字以內）`,
+    hint: 'Kahoot最多4個選項，字數要精簡，適合課堂即時互動'
+  },
+  {
+    section: 'basic-gen', filter: '出題',
+    icon: '🧩', title: '非選擇題（問答題）出題',
+    label: '申論・問答・評量寫作', tags: ['出題','問答','申論','非選'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `我是台灣高中生物老師，請設計 5 題非選擇（問答）題：
+
+設計規格：
+・每題配分：10 分
+・每題包含 2～3 個子問題（(1)(2)(3) 格式）
+・第一子題考記憶（定義、名稱）
+・第二子題考理解（機制、比較）
+・第三子題考應用（情境判斷、實驗設計）
+
+章節範圍：【請填入】
+請提供：完整題目 + 評分標準（逐點給分）+ 參考答案`,
+    hint: '子問題設計建議由淺到深，逐步引導學生作答'
+  },
+
+  // ── 閱讀測驗出題 ──────────────────────────────
+  {
+    section: 'reading', filter: '閱讀',
+    icon: '📄', title: '從長篇文章生成閱讀測驗',
+    label: '貼入文章 → 自動出題', tags: ['閱讀測驗','文章','多選','單選'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `請以剛剛給你的長篇文章內容，設計一組完整閱讀測驗題組：
+
+・單一選擇題 5 題（每題 5 個選項 A～E，答案只有 1 個）
+・多重選擇題 3 題（每題 5 個選項，正確答案 2～4 個）
+・問答題 3 題（需詳細回答，100～200 字）
+
+要求：
+・單選、多選、問答題目內容不能重複
+・題目難度需涵蓋：文意理解、推論應用、批判評估
+・適合高中程度學生
+・每一題附：答案 + 詳解 + 請標示在文章哪一段可找到依據
+・所有文字使用繁體中文`,
+    hint: '先貼入文章，再送出此提示詞。標示答案出處讓學生更容易訂正'
+  },
+  {
+    section: 'reading', filter: '閱讀',
+    icon: '🎬', title: '從 YouTube 影片逐字稿出題',
+    label: 'YouTube → 逐字稿 → 考題', tags: ['閱讀測驗','YouTube','影片','逐字稿'],
+    tools: ['ChatGPT','Claude'],
+    prompt: `步驟一（先整理逐字稿）：
+請整理以下影片逐字稿，幫我：
+1. 修正錯別字與口語化表達
+2. 刪除語助詞（嗯、啊、那個）
+3. 整理成通順的書面文字
+4. 依語意分段，每段加上小標題
+5. 最後輸出 500～800 字的繁體中文摘要
+
+步驟二（逐字稿整理完後再送出）：
+請依照上方整理好的文章，設計閱讀測驗題組：
+・單選題 3 題（5 個選項）
+・多選題 2 題（5 個選項）
+・請附完整答案、詳解，並標示答案在哪一段`,
+    hint: '配合「YouTube Summary with ChatGPT & Claude」外掛取得逐字稿效率更高'
+  },
+  {
+    section: 'reading', filter: '閱讀',
+    icon: '🧬', title: '自行設計文章再出題（科普情境）',
+    label: 'AI創作文章 + 出題', tags: ['閱讀測驗','科普','情境','創作'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `請依照以下題目，先自行創作一篇約 500 字的科普說明文章，再從文章內容出題：
+
+文章主題：【例如：植物共生性菌根的功能與機制】
+文章要求：
+・包含科學概念、機制說明與生活應用
+・語言淺顯，適合高中生閱讀
+・段落分明，至少 3 段
+
+題目設計：
+・單選題 1 題（5 個選項，答案 1 個）
+・多選題 1 題（5 個選項，答案 2～4 個）
+・每題附答案與詳細解析，標示答案出自文章哪一段`,
+    hint: '此提示詞讓AI先創作文章再出題，適合找不到合適科普素材時使用'
+  },
+
+  // ── 改題技巧 ──────────────────────────────────
+  {
+    section: 'modify', filter: '改題',
+    icon: '🔄', title: '單選題 → 多選題（增加選項）',
+    label: '題型轉換 · 難度提升', tags: ['改題','單選','多選','轉換'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `請依題幹敘述，將以下單選題改為多選題：
+
+改題規格：
+・選項從原本的 4 個增加為 5 個（A～E）
+・正確答案需有 2～4 個
+・保留原來的正確選項（調整文字使其更精確）
+・新增合理的正確選項（基於同一概念的延伸知識）
+・修改原本錯誤選項，使其更具迷惑性（設計常見迷思概念）
+・提供完整答案與每個選項的詳細解釋
+
+原題目（貼入此處）：
+【將題目貼在這裡】`,
+    hint: '改成多選題時，錯誤選項要設計成「部分正確但不完整」的迷思概念，鑑別度更高'
+  },
+  {
+    section: 'modify', filter: '改題',
+    icon: '✍️', title: '單選題 → 問答題（申論題）',
+    label: '填充/問答格式', tags: ['改題','問答','申論','轉換'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `請將以下選擇題改成問答題（申論題）格式：
+
+改題要求：
+・從選擇題的核心概念出發，設計 2～3 個子問題
+・第一題：考察基本定義或名稱（2分）
+・第二題：考察機制或過程（4分）
+・第三題：考察應用或比較（4分，選擇性）
+・請提供評分標準（每個得分點明確列出）
+・請提供參考答案（完整作答示範）
+
+原選擇題（貼入此處）：
+【將題目貼在這裡】`,
+    hint: '申論題評分標準要具體，例如：「說明菌根增加吸收面積（2分）」'
+  },
+  {
+    section: 'modify', filter: '改題',
+    icon: '📚', title: '單選題 → 閱讀測驗題組',
+    label: '創作文章再出題', tags: ['改題','閱讀測驗','文章','延伸'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `請依照以下選擇題的核心概念，先設計一段約 400～500 字的說明文章，再從文章出題：
+
+步驟 1：依題幹中的生物概念，撰寫一篇知識性文章（繁體中文，段落分明）
+步驟 2：設計閱讀測驗題組
+  ・單選題 1 題（5 個選項）
+  ・多選題 1 題（5 個選項，答案 2～4 個）
+步驟 3：提供每題答案 + 詳解 + 標示答案在文章第幾段
+
+原選擇題（貼入此處）：
+【將題目貼在這裡】`,
+    hint: 'PPT 第14-16頁展示的菌根題就是這個改法的完整範例'
+  },
+  {
+    section: 'modify', filter: '改題',
+    icon: '⚡', title: '修改選項敘述（維持題型）',
+    label: '選項文字精緻化', tags: ['改題','選項','修改','精緻化'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `請依題幹敘述，修改以下選擇題的選項敘述，使其更符合高中考試水準：
+
+修改原則：
+・正確選項：保持正確，但文字表達更精準、科學性更強
+・錯誤選項：設計為「看似有道理但有關鍵錯誤」的迷思概念
+・所有選項長度盡量相近（避免答案因字數明顯不同而洩題）
+・保持原本題型（單選維持單選，多選維持多選）
+・提供修改後的完整題目 + 答案 + 各選項解釋
+
+原題目（貼入此處）：
+【將題目貼在這裡】`,
+    hint: '選項長度相近是命題品質的重要指標，避免學生猜測'
+  },
+  {
+    section: 'modify', filter: '改題',
+    icon: '🎯', title: '難度調整（由易變難）',
+    label: '提升鑑別度', tags: ['改題','難度','鑑別度','進階'],
+    tools: ['ChatGPT','Claude'],
+    prompt: `請將以下選擇題提升難度，使其更具鑑別度：
+
+難度提升方式（請擇一或組合使用）：
+□ 將情境改為實驗數據分析（圖表判讀）
+□ 增加多個概念的整合與比較
+□ 加入需要計算或推論的情境
+□ 將「直接問答」改為「逆向思考」（從結果推原因）
+□ 加入例外情況或特殊案例
+
+請提供：
+・修改前後的題目對照
+・說明難度如何提升
+・答案與完整解析
+
+原題目（貼入此處）：
+【將題目貼在這裡】`,
+    hint: '學測鑑別度高的題目通常需整合2個以上概念，或加入情境判斷'
+  },
+  {
+    section: 'modify', filter: '改題',
+    icon: '🖼️', title: '圖片/實驗結果題改寫',
+    label: '圖表判讀題設計', tags: ['改題','圖表','實驗','數據'],
+    tools: ['Gemini','ChatGPT'],
+    prompt: `我有一張【實驗結果圖/示意圖/數據表】（已附上或描述如下），請依此設計題目：
+
+圖片/數據描述：【描述圖片內容或實驗結果】
+
+請設計：
+・單選題 1 題：考察學生「讀圖理解」能力
+・多選題 1 題：考察學生「從數據推論」能力
+・問答題 1 題：考察學生「實驗設計批判」能力
+
+每題附答案與詳解，說明應從圖/數據的哪個部分找到答案依據`,
+    hint: 'Gemini 的 Canvas 功能可直接把圖片拖入對話中，效果優於文字描述'
+  },
+
+  // ── 解題解答 ──────────────────────────────────
+  {
+    section: 'solve', filter: '解題',
+    icon: '🧑‍🏫', title: '角色扮演：專業生物老師解題',
+    label: '完整選項解析', tags: ['解題','角色扮演','選項解析','詳解'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `請你扮演一位有 20 年教學經驗的台灣高中生物老師，我給你一份考卷，請逐題解答：
+
+解題格式（每題）：
+【第 X 題】
+・標準答案：（列出答案代號）
+・各選項分析：
+  (A) 選項內容 → 正確/錯誤：理由（50字以上）
+  (B) 選項內容 → 正確/錯誤：理由
+  ...
+・命題重點：此題考察「XXX概念」
+・常見錯誤：學生常誤選（X）的原因是…
+
+請先分析 第 1～5 題。（我再繼續問 6～10 題）
+
+考卷內容（貼入此處）：
+【將考卷題目貼在這裡】`,
+    hint: '每次只分析5題，避免AI回答不完整。分批詢問效果更好'
+  },
+  {
+    section: 'solve', filter: '解題',
+    icon: '📸', title: '拍照上傳考卷快速解題',
+    label: '手機拍照 → AI解答', tags: ['解題','拍照','圖片','快速'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `我上傳了一張高中考卷照片，請幫我解答：
+
+我是台灣高中【科目】老師/學生
+請針對圖片中的考卷：
+1. 識別所有題目（若有文字不清楚請說明）
+2. 逐題寫出標準答案（單選題只有1個，多選題可有多個）
+3. 簡短說明每個選項正確或錯誤的原因
+4. 在答案解析後加上「命題重點」（1～2句話說明本題考察哪個概念）
+
+若有圖表題，請描述圖表內容後再解題`,
+    hint: '圖片中若有中文特殊符號或公式，可在提示詞中特別說明請AI注意'
+  },
+  {
+    section: 'solve', filter: '解題',
+    icon: '📝', title: '單選題逐題解析',
+    label: '標準答案 + 選項解釋', tags: ['解題','單選','逐題','詳解'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `以下是高中考卷的單選題，請寫出答案與詳細解釋：
+・單選題：答案只有一個，其餘選項皆為錯誤
+・格式：
+  答案：（X）
+  解析：（正確選項的理由，50字以上）
+  選項分析：
+  (A)～(E) 逐一說明正確或錯誤原因
+
+考卷題目（貼入此處）：
+【貼入單選題目】`,
+    hint: '可同時貼入多題，AI會一一解析'
+  },
+  {
+    section: 'solve', filter: '解題',
+    icon: '✅', title: '多選題逐題解析',
+    label: '正確選項 + 錯誤選項說明', tags: ['解題','多選','逐題','詳解'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `以下是高中考卷的多選題，請寫出答案與詳細解釋：
+・多選題：正確答案不只一個（通常2～4個）
+・格式：
+  答案：（列出所有正確答案代號，例如：ACE）
+  解析：（說明為何這些選項正確）
+  選項分析：
+  (A)～(E) 逐一說明正確或錯誤原因
+
+考卷題目（貼入此處）：
+【貼入多選題目】`,
+    hint: '多選題如有爭議，可加上「請說明是否有爭議或不同版本答案」'
+  },
+  {
+    section: 'solve', filter: '解題',
+    icon: '📖', title: '閱讀測驗題解析（附出處）',
+    label: '標明答案在哪一段', tags: ['解題','閱讀測驗','出處','詳解'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `以下是高中考卷的閱讀測驗題，請解題：
+・請先確認文章（我已附上）
+・每題解析格式：
+  答案：（X）
+  文章依據：（說明答案出自文章第幾段或哪一句話）
+  解析：（說明答案正確的理由，以及其他選項錯誤的原因）
+  
+注意：
+・單選題答案只有1個
+・多選題答案不只一個
+・請從文章中找到明確依據，不要單靠一般常識回答
+
+文章與題目（貼入此處）：
+【貼入文章與題目】`,
+    hint: '閱讀測驗要強調「從文章找證據」，避免AI根據背景知識而非文章回答'
+  },
+
+  // ── 考卷分析 ──────────────────────────────────
+  {
+    section: 'analysis', filter: '解題',
+    icon: '📊', title: '分析整份考卷命題特點',
+    label: '考試重點總結 + 準備方向', tags: ['分析','命題','重點','準備方向'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `我是台灣老師，以下是一份高中考卷（已附上），請幫我：
+
+1. 【考試概述】：用100字說明這份考卷的考試風格與整體特點
+2. 【命題重點分析】：條列式列出每一大題/每道題考察的核心概念（盡量詳細）
+3. 【各章節分布】：統計各章節題目數量，說明哪個章節比重最高
+4. 【題型分析】：分析各題型的比例與難易度分布
+5. 【學生準備方向】：以老師的語氣，對學生說明如何準備下次考試（500字）
+6. 【常考陷阱】：指出這份考卷中設計的常見迷思概念或陷阱`,
+    hint: '分析完整份考卷需要較長的 context，建議使用 Claude 或 ChatGPT 進行'
+  },
+  {
+    section: 'analysis', filter: '解題',
+    icon: '🗺️', title: '考後訂正導引（給學生用）',
+    label: '學生自主訂正工具', tags: ['分析','訂正','學生','引導'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `我是台灣老師，以下是一份高中考卷與解答（已附上）。
+請寫出每題答案、考試重點，以及每個選項 (A)(B)(C)... 的詳細解釋，讓學生可以自行訂正考卷。
+
+格式要求：
+・每題先給出標準答案
+・再解釋每個選項（正確或錯誤的原因）
+・解釋語氣要像老師對學生說話（親切但嚴謹）
+・最後總結這份考卷，給學生 500 字的「準備方向與複習重點」
+
+考卷內容（貼入此處）：
+【貼入考卷與解答】`,
+    hint: '可搭配「考卷解答PDF」一起上傳，效果更完整'
+  },
+  {
+    section: 'analysis', filter: '解題',
+    icon: '🔢', title: '逐步解析（每5題一批）',
+    label: '分批解析避免漏題', tags: ['分析','分批','逐題','系統化'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `【第一步】請你扮演一位專業生物老師，閱讀我上傳的高中生物考卷，總結這份考試題目要考察的概念與科學知識。
+
+（等AI回覆後再送出第二步）
+
+【第二步】這份檔案為考試卷的每一題解答，請閱讀後記住每一題的答案，等一下需要用這份解答來分析考卷題目。
+
+（等AI確認後再送出第三步）
+
+【第三步】請利用我給你的考試卷答案，分析考試題目：
+・先給出這一題的標準答案（我提供的答案）
+・再分析每一個選項內容是否正確
+
+請先分析 1～5 題。
+
+（分析完後繼續送：「請繼續分析 6～10 題」，依此類推）`,
+    hint: '這是PPT第33頁的完整多步驟解析流程，適合長份考卷（40題以上）'
+  },
+
+  // ── NotebookLM ──────────────────────────────
+  {
+    section: 'notebooklm', filter: '進階',
+    icon: '📓', title: 'NotebookLM：考卷解題簡報',
+    label: '20頁解題投影片', tags: ['NotebookLM','簡報','解題','投影片'],
+    tools: ['NotebookLM'],
+    prompt: `依照標準答案與詳解，全面解析題目；
+設計 20 頁圖文並茂的教學簡報，每一頁一題解題，包含：
+・題目完整敘述
+・正確答案（以醒目格式標示）
+・各選項詳細解析（正確/錯誤原因）
+・相關概念圖或示意圖（自行生成補充）
+・本題「命題重點」小標籤`,
+    hint: 'NotebookLM 簡報產生器在「生成」選項中選擇「簡報」，可自動配圖'
+  },
+  {
+    section: 'notebooklm', filter: '進階',
+    icon: '🗺️', title: 'NotebookLM：生成考試重點資訊圖',
+    label: '知識點視覺化', tags: ['NotebookLM','資訊圖','視覺化','重點'],
+    tools: ['NotebookLM'],
+    prompt: `上傳考卷題目與解答後，請生成一張「考試重點資訊圖」：
+
+資訊圖內容要求：
+・圖表標題：「[科目] 段考核心概念複習指南」
+・將所有考試重點分成 3～5 大類別（例如：細胞構造、遺傳、生態）
+・每個類別下列出 3～5 個核心知識點
+・加入流程圖、比較表或概念圖輔助說明
+・使用圖示或 icon 讓視覺更豐富
+・底部加上「製作人：[老師姓名]」`,
+    hint: 'NotebookLM 的資訊圖功能支援自動配置圖說，PPT第38頁有完整範例'
+  },
+  {
+    section: 'notebooklm', filter: '進階',
+    icon: '✏️', title: 'NotebookLM：手繪筆記風格簡報',
+    label: '課本頁面手寫風格化', tags: ['NotebookLM','手繪','筆記','風格'],
+    tools: ['NotebookLM'],
+    prompt: `將考卷或課本頁面轉成手繪手寫風格的解題筆記簡報：
+
+設計風格：
+・在課本/考卷文字上畫重點標註（黃色螢光筆效果）
+・在圖片或示意圖加上手寫文字補充
+・在空白處加上手寫筆記或概念圖
+・重要概念以不同顏色標示
+
+內容要求：
+・第 1 題至第 20 題每題一頁，共 20 頁
+・每一頁包含：題目、答案標示、手寫補充說明
+・圖片上標示重要構造或概念
+
+注意：生成的圖片要與課本圖片核對細節是否正確`,
+    hint: '手繪風格簡報是 NotebookLM 的特色功能，PPT第39頁有完整展示'
+  },
+
+  // ── 進階技巧 ──────────────────────────────────
+  {
+    section: 'advanced', filter: '進階',
+    icon: '🤖', title: '建立生物專業 AI 機器人（系統提示詞）',
+    label: 'Custom GPT / Claude 系統設定', tags: ['進階','系統提示詞','角色設定','機器人'],
+    tools: ['ChatGPT','Claude','Poe'],
+    prompt: `You are a teacher with professional knowledge in biology and have many years of biology teaching experience. Your database is mainly related to biology. So please answer the question as a biological expert.
+
+You will be provided context from a knowledge base and your own knowledge.
+Your responses should combine custom knowledge base and your own built-in database.
+The content of your response should be as rich as possible, covering more explanations so that the questioner can make a judgment.
+If the database is in English, please read it and translate it into Traditional Chinese to respond.
+If you cannot answer from the context, then say so and produce answers based on your own knowledge.
+
+回答語言：繁體中文
+適合程度：台灣高中生物課程（108課綱）
+回答格式：條列式清楚說明，重要名詞加上英文對照`,
+    hint: '這段提示詞貼到 ChatGPT Custom GPT 的「System Prompt」或 Claude 的 Project 系統指示中'
+  },
+  {
+    section: 'advanced', filter: '進階',
+    icon: '📦', title: '批次出題：多份試卷一次生成',
+    label: '平行班級不同試卷', tags: ['進階','批次','多份','平行'],
+    tools: ['ChatGPT','Claude'],
+    prompt: `我需要為同一個考試範圍出兩份難度不同的試卷（普通班 + 資優班）：
+
+普通班版本（A卷）：
+・單選題 20 題（記憶：理解 = 6:4）
+・多選題 10 題（答案 2～3 個）
+・非選擇題 2 題（簡答型）
+
+資優班版本（B卷）：
+・單選題 15 題（記憶：理解：應用 = 3:4:3）
+・多選題 15 題（答案 2～4 個，鑑別度更高）
+・非選擇題 3 題（論述型，需要整合多個概念）
+
+考試範圍：【請填入】
+・請確保兩份試卷的題目不完全相同，但考察相同的核心概念
+・提供兩份試卷的完整題目 + 解答`,
+    hint: '麗山高中普通班與資優班並行時特別適用此模板'
+  },
+  {
+    section: 'advanced', filter: '進階',
+    icon: '🔍', title: '多 AI 交叉驗證（避免錯誤）',
+    label: '生物專業題目驗證策略', tags: ['進階','驗證','準確性','交叉'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `以下是一道高中生物題目，我要驗證這道題的答案是否正確：
+
+【驗證請求】
+題目：（貼入題目）
+我認為的答案：（X）
+
+請你：
+1. 重新獨立解題，不受我的答案影響
+2. 明確說明每個選項正確或錯誤的科學依據
+3. 若你的答案與我不同，請詳細說明原因
+4. 若有爭議，說明台灣高中課綱的標準說法
+5. 請引用相關生物學原理（如有必要可附英文專有名詞）`,
+    hint: 'PPT第41頁強調：專業課程容易出錯，建議用Claude和Gemini雙重驗證'
+  },
+  {
+    section: 'advanced', filter: '進階',
+    icon: '📋', title: 'Perplexity：聯網出題知識庫',
+    label: '上網搜尋 + 資料庫 + 出題', tags: ['進階','Perplexity','聯網','知識庫'],
+    tools: ['Perplexity','Felo'],
+    prompt: `出一份考卷，【單選題數量】題單選題，【多選題數量】題多選題，【問答題數量】題非選擇問答題，選擇題每一題五個選項，範圍：【考試範圍，例如：遺傳物質的構造與功能（DNA複製、轉錄、轉譯）】
+
+請提供解答與詳解。
+
+附加要求：
+・請上網搜尋最新的科學研究或應用案例作為情境素材
+・確保題目符合台灣高中生物 108 課綱
+・請同時搜尋相關考古題以避免重複`,
+    hint: 'Perplexity 建立「知識庫（Space）」後，可上傳自己的考卷作為參考資料庫'
+  },
+  {
+    section: 'advanced', filter: '進階',
+    icon: '🧑‍💼', title: 'AI Agent 委託出完整試卷',
+    label: 'Manus / SkyWork 自動執行', tags: ['進階','Agent','Manus','SkyWork','自動'],
+    tools: ['Manus','SkyWork'],
+    prompt: `我需要一份完整高中生物段考考卷，請自動規劃並執行以下工作：
+
+考卷規格：
+・考試時間：60 分鐘
+・總分：100 分
+・題型：單選題 25 題（50分）+ 多選題 10 題（20分）+ 閱讀測驗 3 組（30分）
+・考試範圍：【填入章節】
+・難度分布：易30% / 中50% / 難20%
+
+執行步驟（請自動完成）：
+1. 依規格出完整考卷（學生版，不含答案）
+2. 另外生成老師解答卷（含答案 + 詳解）
+3. 確認各題型題數與配分加總正確
+4. 輸出為可下載格式（HTML/Word）`,
+    hint: 'SkyWork 和 Manus 等 AI Agent 可以自動規劃流程並產出完整考卷，PPT第27-28頁有展示'
+  },
+  {
+    section: 'advanced', filter: '進階',
+    icon: '💬', title: 'Monica 側面板：word 考卷即時解題',
+    label: '不離開Word直接解題', tags: ['進階','Monica','Word','側面板'],
+    tools: ['Monica'],
+    prompt: `使用 Monica 側面板時，選取考卷文字後，在提示詞框中輸入：
+
+「請解析這道生物選擇題，
+給出標準答案，
+並逐一說明每個選項正確或錯誤的原因，
+重點標示常見迷思概念。」
+
+（選取題目文字 → 呼叫 Monica → 貼入上方提示詞）`,
+    hint: 'Monica 電腦版可以在 Word 側面板直接解題，不需複製貼上到瀏覽器，PPT第52頁有完整展示'
+  },
+  {
+    section: 'advanced', filter: '進階',
+    icon: '🌟', title: '考題品質自我審查提示詞',
+    label: '命題後品管流程', tags: ['進階','品管','審題','品質'],
+    tools: ['ChatGPT','Claude','Gemini'],
+    prompt: `我出了以下考題，請幫我以命題委員的角色審查：
+
+審查項目：
+1. 【題幹清晰度】：題幹敘述是否清楚、無歧義？
+2. 【選項合理性】：錯誤選項是否具有合理性和迷惑性（不能太明顯錯）？
+3. 【答案唯一性】：單選題是否只有一個最佳答案？多選題答案是否明確？
+4. 【課綱符合性】：是否符合台灣高中 108 課綱範圍？
+5. 【難度適切性】：難度是否符合預設目標（學測/段考/資優班）？
+6. 【建議修改】：若有問題，請提供修改建議
+
+考題（貼入此處）：
+【貼入要審查的考題】`,
+    hint: '出題後讓AI扮演審題委員，可有效避免出題錯誤或爭議性題目'
+  },
+];
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function createCard(p) {
+  const toolBadges = p.tools.map(t => `<span class="tag tool">${t}</span>`).join('');
+  const typeTags = p.tags.slice(0,3).map(t => `<span class="tag type">${t}</span>`).join('');
+  const short = p.prompt.length > 220 ? p.prompt.slice(0,220)+'…' : p.prompt;
+
+  return `
+  <div class="prompt-card" data-section="${p.section}" data-filter="${p.filter}" data-text="${encodeURIComponent(p.prompt + p.title + p.label + p.tags.join(' '))}">
+    <div class="card-top">
+      <span class="card-icon">${p.icon}</span>
+      <div>
+        <div class="card-title">${p.title}</div>
+        <div class="card-label">${p.label}</div>
+        <div class="card-tags">${typeTags}${toolBadges}</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="prompt-text">${escHtml(p.prompt)}</div>
+      ${p.hint ? `<div class="prompt-hint">💡 <strong>小提示：</strong>${escHtml(p.hint)}</div>` : ''}
+    </div>
+    <div class="card-foot">
+      <button class="btn btn-expand" onclick="openModal('${escAttr(p.icon)}','${escAttr(p.title)}','${escAttr(p.prompt)}')">🔍 展開查看</button>
+      <button class="btn btn-copy" onclick="copyCard(this,'${escAttr(p.prompt)}')">📋 複製提示詞</button>
+    </div>
+  </div>`;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n').replace(/\r/g,'');
+}
+
+function renderAll() {
+  const sections = ['basic-gen','reading','modify','solve','analysis','notebooklm','advanced'];
+  sections.forEach(sec => {
+    const grid = document.getElementById('grid-'+sec);
+    const items = PROMPTS.filter(p => p.section === sec);
+    grid.innerHTML = items.map(createCard).join('');
+    const cnt = document.getElementById('cnt-'+sec);
+    if(cnt) cnt.textContent = items.length;
+  });
+  document.getElementById('totalCount').textContent = PROMPTS.length;
+  updateShowCount();
+}
+
+function updateShowCount() {
+  const visible = document.querySelectorAll('.prompt-card:not(.hidden)').length;
+  document.getElementById('showCount').textContent = visible;
+  document.getElementById('noResult').style.display = visible === 0 ? 'block' : 'none';
+}
+
+// ── FILTER & SEARCH ──
+let currentFilter = 'all';
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    applyFilter();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', applyFilter);
+
+function applyFilter() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const f = currentFilter;
+
+  document.querySelectorAll('.prompt-card').forEach(card => {
+    const text = decodeURIComponent(card.dataset.text).toLowerCase();
+    const filterOk = f === 'all' || card.dataset.filter === f;
+    const searchOk = q === '' || text.includes(q);
+    card.classList.toggle('hidden', !(filterOk && searchOk));
+  });
+
+  // Hide empty sections
+  document.querySelectorAll('.prompt-section').forEach(sec => {
+    const visible = sec.querySelectorAll('.prompt-card:not(.hidden)').length;
+    sec.classList.toggle('hidden', visible === 0);
+  });
+
+  updateShowCount();
+}
+
+// ── COPY ──
+function copyCard(btn, promptRaw) {
+  const text = promptRaw.replace(/\\n/g,'\n').replace(/\\'/g,"'").replace(/\\\\/g,'\\');
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ 已複製！';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    prompt('複製以下提示詞：', text);
+  });
+}
+
+// ── MODAL ──
+let _modalPrompt = '';
+function openModal(icon, title, promptRaw) {
+  const text = promptRaw.replace(/\\n/g,'\n').replace(/\\'/g,"'").replace(/\\\\/g,'\\');
+  _modalPrompt = text;
+  document.getElementById('modalIcon').textContent = icon;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').textContent = text;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+function copyModal() {
+  navigator.clipboard.writeText(_modalPrompt).then(() => {
+    const btn = document.getElementById('modalCopyBtn');
+    btn.innerHTML = '✅ 已複製！';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = '📋 複製提示詞'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if(e.target === document.getElementById('modalOverlay')) closeModal();
+});
+
+// ── SCROLL TO ──
+function scrollTo(el) {
+  const href = el.getAttribute('href');
+  const target = document.querySelector(href);
+  if(target) { target.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── INIT ──
+renderAll();
+</script>
+</body>
+</html>

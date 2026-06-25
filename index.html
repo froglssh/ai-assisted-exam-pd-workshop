@@ -1,1057 +1,305 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI 輔助考卷出改解題</title>
-<style>
-  /* ── DARK THEME (default) ── */
-  :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #222636;
-    --accent: #4f7fff;
-    --accent2: #7c5cfc;
-    --text: #e8eaf0;
-    --text-dim: #9ca3b8;
-    --border: #2e3348;
-    --gold: #f5c842;
-    --slide-bg: #000;
-    --thumb-strip-bg: #0f1117;
-  }
-  /* ── LIGHT THEME ── */
-  body.light {
-    --bg: #f0f2f8;
-    --surface: #ffffff;
-    --surface2: #e8eaf2;
-    --accent: #3060dd;
-    --accent2: #6040cc;
-    --text: #1a1d30;
-    --text-dim: #5a6080;
-    --border: #d0d4e8;
-    --gold: #b8860b;
-    --slide-bg: #e0e2ec;
-    --thumb-strip-bg: #e8eaf2;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  /* ── HEADER ── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 24px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .header-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: .04em;
-    background: linear-gradient(135deg, #5b8fff, #a56bff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    white-space: nowrap;
-  }
-  .header-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .ctrl-label { font-size: .8rem; color: var(--text-dim); white-space: nowrap; }
-  .ctrl-select {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: .85rem;
-    cursor: pointer;
-  }
-  .btn {
-    padding: 6px 14px;
-    border-radius: 8px;
-    border: none;
-    font-size: .85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity .15s, transform .1s;
-  }
-  .btn:hover { opacity: .85; transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
-  .btn-play {
-    background: linear-gradient(135deg, #4f7fff, #7c5cfc);
-    color: #fff;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .btn-fs {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; gap: 5px;
-  }
-  .btn-fs.active {
-    background: linear-gradient(135deg, #2a5ccc, #5a3db0);
-    border-color: transparent;
-    color: #fff;
-  }
-
-  /* ── MAIN ── */
-  main {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  /* ── SLIDE PANEL (left 2/3) ── */
-  .slide-panel {
-    flex: 0 0 66.666%;
-    display: flex;
-    flex-direction: column;
-    background: var(--slide-bg);
-    position: relative;
-    overflow: hidden;
-  }
-  .slide-img-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    overflow: hidden;
-  }
-  .slide-img-wrap img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 6px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.6);
-    transition: opacity .35s ease;
-    display: block;
-  }
-  .slide-img-wrap img.fading { opacity: 0; }
-
-  /* ── TEXT PANEL (right 1/3) ── */
-  .text-panel {
-    flex: 0 0 33.333%;
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-    border-left: 1px solid var(--border);
-    overflow: hidden;
-  }
-  .text-header {
-    padding: 14px 20px 10px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .slide-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #4f7fff33, #7c5cfc33);
-    border: 1px solid #4f7fff55;
-    color: var(--accent);
-    font-size: .78rem;
-    font-weight: 700;
-    padding: 2px 10px;
-    border-radius: 20px;
-    letter-spacing: .06em;
-    margin-bottom: 6px;
-  }
-  .slide-title-text {
-    font-size: 1.3rem;
-    font-weight: 700;
-    line-height: 1.5;
-    color: var(--text);
-  }
-  .text-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 24px 24px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-  .text-body p {
-    font-size: 1.3rem;
-    line-height: 2.05;
-    color: var(--text);
-    margin-bottom: 20px;
-  }
-  .text-body p:last-child { margin-bottom: 0; }
-
-  /* ── BOTTOM NAV ── */
-  .bottom-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 10px 20px;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
-    flex-shrink: 0;
-  }
-  .nav-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    width: 36px; height: 36px;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .15s, transform .1s;
-  }
-  .nav-btn:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
-  .nav-btn:active:not(:disabled) { transform: scale(.95); }
-  .nav-btn:disabled { opacity: .3; cursor: not-allowed; }
-  .page-indicator {
-    font-size: .9rem;
-    color: var(--text-dim);
-    min-width: 80px;
-    text-align: center;
-    font-weight: 600;
-  }
-  .progress-bar-wrap {
-    flex: 1;
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    max-width: 200px;
-  }
-  .progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #4f7fff, #7c5cfc);
-    border-radius: 2px;
-    transition: width .3s ease;
-  }
-
-  /* ── THUMBNAIL STRIP ── */
-  .thumb-strip {
-    display: flex;
-    gap: 6px;
-    padding: 8px 16px;
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    overflow-x: auto;
-    flex-shrink: 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-    max-height: 110px;
-    padding: 10px 16px;
-  }
-  .thumb {
-    flex-shrink: 0;
-    width: 116px;
-    height: 82px;
-    border-radius: 5px;
-    object-fit: cover;
-    cursor: pointer;
-    border: 2px solid transparent;
-    opacity: .55;
-    transition: opacity .15s, border-color .15s, transform .15s;
-  }
-  .thumb:hover { opacity: .85; transform: scaleY(1.04); }
-  .thumb.active { border-color: var(--accent); opacity: 1; }
-
-  /* ── AUTHOR INFO (in header) ── */
-  .header-author {
-    font-size: .82rem;
-    color: var(--text-dim);
-    letter-spacing: .04em;
-    white-space: nowrap;
-    border-left: 1px solid var(--border);
-    padding-left: 14px;
-    margin-left: 4px;
-  }
-  .header-author strong { color: var(--gold); font-weight: 700; }
-
-  /* ── FULLSCREEN OVERLAY ── */
-  #fs-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #000;
-    z-index: 9999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  #fs-overlay.active { display: flex; }
-  #fs-img {
-    max-width: 100vw;
-    max-height: calc(100vh - 80px);
-    object-fit: contain;
-    transition: opacity .35s ease;
-    display: block;
-  }
-  #fs-img.fading { opacity: 0; }
-  .fs-controls {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    padding: 12px 24px;
-    background: rgba(0,0,0,.75);
-    backdrop-filter: blur(8px);
-    transition: opacity .3s;
-  }
-  .fs-controls.hidden { opacity: 0; pointer-events: none; }
-  .fs-nav-btn {
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.2);
-    color: #fff;
-    width: 40px; height: 40px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .15s;
-  }
-  .fs-nav-btn:hover:not(:disabled) { background: rgba(255,255,255,.25); }
-  .fs-nav-btn:disabled { opacity: .25; cursor: not-allowed; }
-  .fs-page { color: rgba(255,255,255,.75); font-size: .9rem; min-width: 70px; text-align: center; }
-  .fs-exit-btn {
-    position: fixed;
-    top: 14px; right: 18px;
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.2);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: .82rem;
-    cursor: pointer;
-    z-index: 10001;
-    transition: background .15s;
-  }
-  .fs-exit-btn:hover { background: rgba(255,255,255,.25); }
-  .fs-auto-label {
-    color: rgba(255,255,255,.6);
-    font-size: .8rem;
-    white-space: nowrap;
-  }
-  .fs-ctrl-select {
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.2);
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: .82rem;
-    cursor: pointer;
-  }
-  .fs-progress {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: rgba(255,255,255,.1);
-    z-index: 10001;
-  }
-  .fs-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #4f7fff, #a56bff);
-    transition: width .3s ease;
-  }
-  /* Auto-play timer ring */
-  .timer-ring {
-    position: relative;
-    width: 32px; height: 32px;
-    flex-shrink: 0;
-  }
-  .timer-ring svg { transform: rotate(-90deg); }
-  .timer-ring circle {
-    fill: none;
-    stroke-width: 3;
-  }
-  .timer-bg { stroke: rgba(255,255,255,.15); }
-  .timer-fill { stroke: #4f7fff; stroke-dasharray: 88; stroke-dashoffset: 88; transition: stroke-dashoffset .1s linear; }
-
-  /* Thumbnail strip bg */
-  .thumb-strip { background: var(--thumb-strip-bg); }
-
-  /* Scrollbar style */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  /* ── THEME TOGGLE BUTTON ── */
-  .btn-theme {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; gap: 6px;
-    font-size: .85rem;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background .2s, color .2s, border-color .2s, transform .1s;
-    white-space: nowrap;
-  }
-  .btn-theme:hover { opacity: .85; transform: translateY(-1px); }
-  body.light .btn-theme {
-    background: #1a1d27;
-    color: #e8eaf0;
-    border-color: #3a4060;
-  }
-
-  /* Auto play indicator */
-  .auto-indicator {
-    display: inline-block;
-    width: 8px; height: 8px;
-    background: #4fff8a;
-    border-radius: 50%;
-    margin-right: 4px;
-    animation: pulse-dot 1s infinite;
-  }
-  @keyframes pulse-dot {
-    0%,100% { opacity: 1; }
-    50% { opacity: .3; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 輔助出題、改題與解題教學平台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">
 </head>
-<body>
+<body class="dark-theme">
+    <div class="app-container">
 
-<!-- HEADER -->
-<header>
-  <div class="header-title">🎓 AI 輔助考卷出改解題</div>
-  <div class="header-author">臺北市立麗山高中 ｜ <strong>林獻升 老師</strong> 製作</div>
-  <div class="header-controls" style="margin-left:auto;">
-    <span class="ctrl-label">自動播放：</span>
-    <select class="ctrl-select" id="autoSpeedSelect">
-      <option value="0">關閉</option>
-      <option value="4">4 秒</option>
-      <option value="6" selected>6 秒</option>
-      <option value="8">8 秒</option>
-      <option value="12">12 秒</option>
-      <option value="20">20 秒</option>
-    </select>
-    <button class="btn btn-play" id="playBtn" onclick="togglePlay()">
-      <span id="playIcon">▶</span> <span id="playLabel">播放</span>
-    </button>
-    <button class="btn btn-fs" id="fsBtn" onclick="enterFullscreen()">
-      ⛶ 全螢幕
-    </button>
-    <button class="btn-theme" id="themeBtn" onclick="toggleTheme()" title="切換背景色">
-      <span id="themeIcon">☀️</span><span id="themeLabel">白底</span>
-    </button>
-  </div>
-</header>
+        <!-- ═══════════════════════════════════════
+             SIDEBAR
+        ═══════════════════════════════════════ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="生物科圖案.jpg" alt="生物科" class="sidebar-logo-img">
+                <div class="sidebar-brand-text">
+                    <span class="brand-title">AI 評量工具平台</span>
+                    <span class="brand-sub">麗山高中生物科</span>
+                </div>
+            </div>
 
-<!-- MAIN AREA -->
-<main>
-  <!-- Left: Slide image -->
-  <div class="slide-panel">
-    <div class="slide-img-wrap">
-      <img id="mainImg" src="" alt="Slide">
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-target="intro">
+                    <i class="fa-solid fa-house"></i>
+                    <span>首頁</span>
+                </a>
+
+                <div class="nav-group-label">六大資源模組</div>
+
+                <a href="#" class="nav-item" data-target="module-0">
+                    <span class="nav-num">01</span>
+                    <span>系統設定與提示詞</span>
+                </a>
+                <a href="#" class="nav-item" data-target="module-1">
+                    <span class="nav-num">02</span>
+                    <span>AI 輔助出題實踐</span>
+                </a>
+                <a href="#" class="nav-item" data-target="module-2">
+                    <span class="nav-num">03</span>
+                    <span>AI 輔助解題與分析</span>
+                </a>
+                <a href="#" class="nav-item" data-target="module-3">
+                    <span class="nav-num">04</span>
+                    <span>小論文專家評審</span>
+                </a>
+                <a href="#" class="nav-item" data-target="module-4">
+                    <span class="nav-num">05</span>
+                    <span>非選與手寫批改</span>
+                </a>
+                <a href="#" class="nav-item" data-target="module-5">
+                    <span class="nav-num">06</span>
+                    <span>出題與修題理論</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="speaker-info">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <div>
+                        <p class="speaker-name">林獻升 老師</p>
+                        <p class="speaker-sub">麗山高中生物教師</p>
+                    </div>
+                </div>
+                <div class="studio-badge">
+                    <i class="fa-solid fa-flask"></i> LM 工作室 協力開發
+                </div>
+            </div>
+        </aside>
+
+        <!-- ═══════════════════════════════════════
+             MAIN CONTENT
+        ═══════════════════════════════════════ -->
+        <main class="main-content">
+
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <button class="menu-btn" id="mobile-toggle" aria-label="開啟選單">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <span class="top-bar-title">AI 輔助出改解題教學平台</span>
+                </div>
+                <div class="top-bar-right">
+                    <div class="search-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="搜尋檔案…" id="file-search">
+                        <button id="clear-search" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <button class="theme-btn" id="theme-toggle" title="切換深色／淺色">
+                        <i class="fa-solid fa-sun icon-sun"></i>
+                        <i class="fa-solid fa-moon icon-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Page Scroll Area -->
+            <div class="scroll-container">
+
+                <!-- ─────────────── PAGE: INTRO ─────────────── -->
+                <section id="page-intro" class="content-page active">
+
+                    <!-- Hero Banner -->
+                    <div class="hero">
+                        <div class="hero-text">
+                            <span class="hero-badge">
+                                <i class="fa-solid fa-robot"></i> 智慧教學評量工作流
+                            </span>
+                            <h1 class="hero-title">AI 助教時代的<br>教學評量革命</h1>
+                            <p class="hero-desc">
+                                專為高中與國中教師設計的智慧教學評量資源庫。結合大型語言模型與多模態 AI 技術，幫助教師擺脫繁重的命題與批改負擔，回歸教學初心，專注於師生探究互動。
+                            </p>
+                            <p class="hero-teacher">
+                                <i class="fa-solid fa-user-tie"></i>
+                                林獻升 老師・麗山高中生物科・LM 工作室 協力製作
+                            </p>
+                            <div class="hero-btns">
+                                <a href="https://froglssh.github.io/ai-assisted-exam-pd-workshop/%E7%A0%94%E7%BF%92%E6%95%99%E5%AD%B8%E7%B6%B2%E9%A0%81.html" target="_blank" class="btn btn-primary">
+                                    <i class="fa-solid fa-circle-play"></i> 線上研習簡報
+                                </a>
+                                <a href="https://drive.google.com/file/d/1fWZDfsmoMmHr1OS3sS5K5PD50WmvjYrc/view?usp=drive_link" target="_blank" class="btn btn-outline">
+                                    <i class="fa-solid fa-file-pdf"></i> 下載 PDF 簡報
+                                </a>
+                                <a href="https://drive.google.com/drive/folders/1tesyMhAUjFThW4bvDOeYQFuE6hKwhait?usp=drive_link" target="_blank" class="btn btn-drive">
+                                    <i class="fa-brands fa-google-drive"></i> 開啟雲端資料夾
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hero-image">
+                            <img src="生物科圖案.jpg" alt="生物科圖案" class="bio-logo">
+                        </div>
+                    </div>
+
+                    <!-- Padlet Section -->
+                    <div class="section-block">
+                        <h2 class="section-heading">
+                            <i class="fa-solid fa-thumbtack"></i> 課程互動看板
+                        </h2>
+                        <a href="https://padlet.com/linxiansheng2_1/ai-zg40knlw1netn2v4" target="_blank" class="padlet-card">
+                            <div class="padlet-icon">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <div class="padlet-info">
+                                <h3>AI 輔助出改解題・研習互動牆</h3>
+                                <p>點此開啟 Padlet 互動看板，分享您的研習心得、提問與實作成果</p>
+                                <span class="padlet-link-text">
+                                    padlet.com/linxiansheng2_1/ai-zg40knlw1netn2v4
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </span>
+                            </div>
+                            <div class="padlet-arrow">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Quick Tools -->
+                    <div class="section-block">
+                        <h2 class="section-heading">
+                            <i class="fa-solid fa-bolt"></i> 核心互動工具
+                        </h2>
+                        <div class="tools-grid">
+                            <a href="https://claude.ai/public/artifacts/fa883300-e0d8-4f3a-bb3a-780068b69fee" target="_blank" class="tool-card accent-purple">
+                                <div class="tool-card-icon"><i class="fa-solid fa-sliders"></i></div>
+                                <div class="tool-card-body">
+                                    <h4>AI 出題改題解題提示詞工具</h4>
+                                    <p>整合各大模型提示詞，一鍵複製黃金結構提示詞</p>
+                                </div>
+                                <i class="fa-solid fa-arrow-up-right-from-square tool-ext-icon"></i>
+                            </a>
+                            <a href="AI生物教學課程提示詞.html" target="_blank" class="tool-card accent-blue">
+                                <div class="tool-card-icon"><i class="fa-solid fa-dna"></i></div>
+                                <div class="tool-card-body">
+                                    <h4>AI 生物教學課程提示詞</h4>
+                                    <p>生物學科專屬提示詞工具，涵蓋課程設計與探究引導</p>
+                                </div>
+                                <i class="fa-solid fa-arrow-up-right-from-square tool-ext-icon"></i>
+                            </a>
+                            <a href="https://froglssh.github.io/ai-assisted-exam-pd-workshop/%E7%A0%94%E7%BF%92%E6%95%99%E5%AD%B8%E7%B6%B2%E9%A0%81.html" target="_blank" class="tool-card accent-green">
+                                <div class="tool-card-icon"><i class="fa-solid fa-presentation-screen"></i></div>
+                                <div class="tool-card-body">
+                                    <h4>研習投影片線上檢視器</h4>
+                                    <p>免安裝直接在線觀看 32 頁完整投影片與詳細講稿</p>
+                                </div>
+                                <i class="fa-solid fa-arrow-up-right-from-square tool-ext-icon"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Drive Download -->
+                    <div class="section-block">
+                        <div class="drive-banner">
+                            <div class="drive-banner-left">
+                                <i class="fa-brands fa-google-drive drive-icon"></i>
+                                <div>
+                                    <h3>所有教材檔案均可從 Google 雲端硬碟下載</h3>
+                                    <p>點擊各模組的「雲端下載」按鈕，將自動複製檔名並開啟雲端資料夾，於搜尋框貼上即可快速定位</p>
+                                </div>
+                            </div>
+                            <a href="https://drive.google.com/drive/folders/1tesyMhAUjFThW4bvDOeYQFuE6hKwhait?usp=drive_link" target="_blank" class="btn btn-drive">
+                                <i class="fa-solid fa-folder-open"></i> 前往雲端資料夾
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Four Core Modules -->
+                    <div class="section-block">
+                        <h2 class="section-heading">
+                            <i class="fa-solid fa-sitemap"></i> 研習四大核心架構
+                        </h2>
+                        <div class="modules-intro-grid">
+                            <div class="module-intro-card">
+                                <div class="mic-num">01</div>
+                                <h4>評量變革學理基礎</h4>
+                                <p>解析新課綱「評量深淵」痛點，介紹會考三多一沒有、學測混合題型、分科測驗鷹架式題組之大考趨勢，對齊布魯姆認知層次命題配置。</p>
+                            </div>
+                            <div class="module-intro-card">
+                                <div class="mic-num">02</div>
+                                <h4>AI 輔助出題實務</h4>
+                                <p>學習提示詞黃金結構（角色、任務、格式、限制），利用影音逐字稿、實驗指南進行多模態出題，對比各大模型命題與誘答選項設計能力。</p>
+                            </div>
+                            <div class="module-intro-card">
+                                <div class="mic-num">03</div>
+                                <h4>AI 輔助改題與批改</h4>
+                                <p>傳統題目素養改造實踐，設計階段式 Rubrics 評分規準，透過 AI 視覺模態進行實體手寫考卷、國寫非選批改評審，輔以 Gradescope 應用。</p>
+                            </div>
+                            <div class="module-intro-card">
+                                <div class="mic-num">04</div>
+                                <h4>AI 輔助解題與代理</h4>
+                                <p>一鍵生成詳解與班級複習指引，利用 NotebookLM 建立專屬解題 AI 助教，設定 GPTs / Gem 系統 Bot，實現一鍵自動化命題排版工作流。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ─────────────── PAGE: MODULE ─────────────── -->
+                <section id="page-module" class="content-page">
+                    <div class="module-hero">
+                        <div class="module-hero-num" id="module-display-num">01</div>
+                        <div class="module-hero-info">
+                            <span class="hero-badge" id="module-display-badge">模組單元</span>
+                            <h2 id="module-display-title">模組標題</h2>
+                        </div>
+                    </div>
+
+                    <div class="desc-card">
+                        <i class="fa-solid fa-graduation-cap desc-icon"></i>
+                        <div>
+                            <h4>教學指引與實踐心法</h4>
+                            <p id="module-display-desc">模組詳細說明...</p>
+                        </div>
+                    </div>
+
+                    <div id="module-tool-showcase" style="display:none;">
+                        <h2 class="section-heading">
+                            <i class="fa-solid fa-bolt"></i> 此模組特選互動工具
+                        </h2>
+                        <div class="tools-grid" id="module-tools-list"></div>
+                    </div>
+
+                    <div class="section-block">
+                        <h2 class="section-heading">
+                            <i class="fa-solid fa-folder-open"></i> 單元檔案與實作資源
+                        </h2>
+                        <div class="file-list-header">
+                            <span class="file-count" id="file-display-count">共 0 個檔案</span>
+                            <div class="file-filters">
+                                <button class="filter-btn active" data-type="all">全部</button>
+                                <button class="filter-btn" data-type="pdf">PDF</button>
+                                <button class="filter-btn" data-type="media">影音/簡報</button>
+                                <button class="filter-btn" data-type="other">其他</button>
+                            </div>
+                        </div>
+                        <div class="files-grid" id="module-files-grid"></div>
+                    </div>
+                </section>
+
+                <!-- ─────────────── PAGE: SEARCH ─────────────── -->
+                <section id="page-search" class="content-page">
+                    <div class="search-page-header">
+                        <h2><i class="fa-solid fa-magnifying-glass"></i> 搜尋結果</h2>
+                        <p id="search-query-text">搜尋關鍵字：""</p>
+                    </div>
+                    <div class="file-list-header">
+                        <span class="file-count" id="search-results-count">共找到 0 個相符的檔案</span>
+                    </div>
+                    <div class="files-grid" id="search-files-grid"></div>
+                </section>
+
+            </div><!-- /scroll-container -->
+        </main>
     </div>
-    <!-- Thumbnail strip -->
-    <div class="thumb-strip" id="thumbStrip"></div>
-  </div>
 
-  <!-- Right: Text panel -->
-  <div class="text-panel">
-    <div class="text-header">
-      <div class="slide-badge" id="slideBadge">SLIDE 01</div>
-      <div class="slide-title-text" id="slideTitleText"></div>
-    </div>
-    <div class="text-body" id="textBody"></div>
-  </div>
-</main>
+    <!-- Toast -->
+    <div id="toast-container" class="toast-container"></div>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <button class="nav-btn" id="prevBtn" onclick="gotoSlide(current-1)" title="上一頁">◀</button>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
-  <div class="page-indicator" id="pageIndicator">1 / 32</div>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar" id="progressBar2"></div>
-  </div>
-  <button class="nav-btn" id="nextBtn" onclick="gotoSlide(current+1)" title="下一頁">▶</button>
-</div>
-
-<!-- FULLSCREEN OVERLAY -->
-<div id="fs-overlay">
-  <div class="fs-progress"><div class="fs-progress-bar" id="fsProgressBar"></div></div>
-  <button class="fs-exit-btn" onclick="exitFullscreen()">✕ 離開全螢幕</button>
-  <img id="fs-img" src="" alt="Slide Fullscreen">
-  <div class="fs-controls" id="fsControls">
-    <button class="fs-nav-btn" id="fsPrevBtn" onclick="gotoSlide(current-1)">◀</button>
-    <div class="timer-ring" id="timerRing" title="自動播放進度">
-      <svg width="32" height="32" viewBox="0 0 32 32">
-        <circle class="timer-bg" cx="16" cy="16" r="14"/>
-        <circle class="timer-fill" id="timerCircle" cx="16" cy="16" r="14"/>
-      </svg>
-    </div>
-    <span class="fs-page" id="fsPageIndicator">1 / 32</span>
-    <div class="timer-ring" style="visibility:hidden"></div><!-- spacer -->
-    <button class="fs-nav-btn" id="fsNextBtn" onclick="gotoSlide(current+1)">▶</button>
-    <span class="fs-auto-label" style="margin-left:12px">自動播放：</span>
-    <select class="fs-ctrl-select" id="fsAutoSpeedSelect">
-      <option value="0">關閉</option>
-      <option value="4">4 秒</option>
-      <option value="6" selected>6 秒</option>
-      <option value="8">8 秒</option>
-      <option value="12">12 秒</option>
-      <option value="20">20 秒</option>
-    </select>
-    <button class="fs-nav-btn" id="fsPauseBtn" onclick="togglePlay()" title="播放/暫停" style="font-size:.9rem">▶</button>
-  </div>
-</div>
-
-<script>
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  SLIDE DATA
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-const slides = [
-  {
-    title: "AI助教時代的教學評量革命",
-    img: "origin_image/slide_01.png",
-    text: `今天這場研習的主軸，藏著一個在教學現場醞釀已久的問題：面對 108 課綱的素養評量浪潮，我們能不能讓 AI 成為真正有用的助教，而不只是一個花俏的科技玩具？
-
-從麗山生物科的教學現場出發，今天把這段走過來的實踐經驗直接分享給大家，希望帶回去就能用。`
-  },
-  {
-    title: "今天研習的四大核心模組",
-    img: "origin_image/slide_02.png",
-    text: `今天的研習設計了四個模組，彼此之間有內在的邏輯串連。
-
-我們從學理基礎出發，先確立「什麼才算真正意義上的素養評量」；接著進入 AI 出題實務，實際看看多模態材料與實驗情境如何快速轉化成考題；第三個模組聚焦在智慧批改，包括手寫非選題與國寫作文的 AI 評閱流程；最後，我們一起建立 NotebookLM 解題助教，讓這套工作流完整落地在班級現場。`
-  },
-  {
-    title: "108課綱下，教師的「評量深淵」",
-    img: "origin_image/slide_03.png",
-    text: `108 課綱對情境化命題的要求，是一把雙面刃。它讓評量變得更真實，但也讓出題變得極度耗時——找素材、處理圖表、撰寫長篇情境文，一份段考卷動輒花上整個週末。
-
-更別說手寫題的批改，改到肩膀痠痛，每位學生卻只能得到一個分數，幾乎沒有個別的學習回饋。這就是我們所說的「評量深淵」：好的設計理念，卻因工作量過重而難以真正落實。`
-  },
-  {
-    title: "教師與 AI 協同的四個應用層次",
-    img: "origin_image/slide_04.png",
-    text: `面對這個困境，我們整理了一張學習地圖，把教師與 AI 協同的應用分成四個層次。
-
-最入門的 Level 1，是把現成的 PDF 講義直接交給 AI 一鍵生出題庫；Level 2 是學會提示詞，能按需改造舊題；Level 3 能融入影片與實驗材料進行多模態命題；Level 4 則是善用視覺辨識與 AI 代理人，實現半自動化出卷。今天我們就一關一關地往上走。`
-  },
-  {
-    title: "素養試題的四大靈魂要素",
-    img: "origin_image/slide_05.png",
-    text: `素養導向評量的核心，可以用四個要素概括：情境脈絡、整合運用、能力表現，以及態度與價值。這四者並不是各自獨立的條件，而是相互嵌扣的整體。
-
-其中最容易出問題的，是情境的真實性——如果把題目的情境段落遮住，學生仍然能靠公式做出答案，那這個情境就只是裝飾，稱不上真正的素養題，需要從根本重新設計。`
-  },
-  {
-    title: "國中教育會考：三多一沒有",
-    img: "origin_image/slide_06.png",
-    text: `國中會考在自然科的命題邏輯，可以用「三多一沒有」來掌握：文字多、圖表多、情境多，但沒有複雜的計算。
-
-圖表題在會考自然科佔了七到八成，這個比例很清楚地告訴我們，訓練學生的圖表解讀與變因控制能力，比讓他們背大量細節更為關鍵。我們的命題，也應該往這個方向靠攏。`
-  },
-  {
-    title: "大學學測：學術情境化與混合題型",
-    img: "origin_image/slide_07.png",
-    text: `學測的挑戰在於閱讀量。自然科和國語文的字數每年都在刷新記錄，學生在有限時間內要消化大量的情境文字，本身就是一項能力的測驗。
-
-更值得關注的是混合題組的出現——選擇題與非選擇手寫題共享同一個情境，層層遞進，讓學生無法只靠猜選項過關，必須真正理解情境脈絡才能作答。`
-  },
-  {
-    title: "分科測驗：鷹架式題組與第一性原理",
-    img: "origin_image/slide_08.png",
-    text: `分科測驗則是真正在考科學思辨的素養。它常常引入陌生的學術情境——如 GLP-1 減重藥物的作用機制，或是植物工廠的能量轉換——要求學生回歸第一性原理，用最核心的學科概念去分析一個全新的狀況。
-
-非選題配分大幅增加，答題不是填幾個關鍵字，而是要寫出一條清晰的因果推論鏈。`
-  },
-  {
-    title: "命題計畫：認知層次與難度配置",
-    img: "origin_image/slide_09.png",
-    text: `有了大考格局的認識，我們回到日常命題的規劃。建議以布魯姆認知層次作為標尺，素養題的主力要落在 C3（應用）與 C4（分析）。
-
-這張表格提供的是段考、會考與學測三種情境下，易、中偏易、中偏難、難題的建議比例配置，讓我們每次命題不再憑感覺，而是有據可依。`
-  },
-  {
-    title: "一鍵生成：Kahoot! AI 與 Quizizz AI",
-    img: "origin_image/slide_10.png",
-    text: `如果只有十分鐘，想快速為課堂複習設計一個小測驗，Level 1 工具是最省力的選擇。
-
-Kahoot! AI 可以直接讀取您的講義 PDF，一鍵生成互動遊戲題；Quizizz AI（Wayground）更進一步，支援直接從 YouTube 影片或網頁抓取內容轉成測驗。學生在遊戲情境中練習，課堂氣氛立刻不同，而教師幾乎不需要花額外的時間準備。`
-  },
-  {
-    title: "智慧診斷：Edcafe AI 與個人化學習回饋",
-    img: "origin_image/slide_11.png",
-    text: `Edcafe AI 把學生診斷這件事提升到了新的層次。學生作答之後，系統不只告訴他「答錯了」，而是根據他選擇的那個具體錯誤選項，給出個人化的 AI 診斷回饋——解釋為什麼這樣想是常見的迷思，並引導學生重新思考正確的推理路徑。
-
-這比單純公布標準答案，更能幫助學生真正釐清自己的盲點。`
-  },
-  {
-    title: "如何與 AI 對話？出題提示詞的黃金結構",
-    img: "origin_image/slide_12.png",
-    text: `要讓 AI 出精準的段考題，提示詞的結構是關鍵。我們整理出一套黃金結構：先設定角色（你是一位高中生物教師），接著給予具體任務（依據以下情境出一道閱讀題組），再指定格式（單選五選一，附詳解），最後加上限制條件（難度對應學測程度，情境不可以是裝飾性的）。
-
-把 AI 當成一位剛報到的實習助教，指令越清晰，出來的題目越可用。`
-  },
-  {
-    title: "影音命題：鹽沼天牛生存機制測驗生成",
-    img: "origin_image/slide_13.png",
-    text: `這是一個 Level 3 的實作案例。我們找到一支介紹鹽沼天牛不進食機制的科普 YouTube 影片，讓 AI 擷取逐字稿，再從中提取能量代謝的生物學情境，最後一鍵產出了一組結構完整的閱讀測驗題。
-
-整個過程不超過十五分鐘，而產出的題目情境新穎、知識點扎實，是過去手動出題難以達到的效率。`
-  },
-  {
-    title: "實驗命題：將課本實驗轉為探究題組",
-    img: "origin_image/slide_14.png",
-    text: `實驗課的素材，也可以直接轉化成探究題。只要把課本的實驗步驟——例如有機物檢測或酵素活性的操作流程——丟給 AI，它就能辨識出操縱變因與控制變因，並據此命製考查實驗設計缺陷或數據解讀能力的題目。
-
-這些題目特別接地氣，因為情境就是學生親手做過的實驗，作答起來有真實感，也更能測出理解深度。`
-  },
-  {
-    title: "視覺出題：讓圖表、構造圖自動出題",
-    img: "origin_image/slide_15.png",
-    text: `圖表題和構造圖一直是許多老師命題的難關——找圖、描圖、排版，耗費大量時間。現在使用 Gemini 等具備強大視覺辨識能力的模型，可以直接截圖課本的心臟解剖圖或細胞分裂圖，請 AI 辨識圖中標示的結構並針對各標記出題。
-
-整個出題流程從找素材到產出題目，往往只需要幾分鐘。`
-  },
-  {
-    title: "出題工具箱：各大 AI 模型能力評比",
-    img: "origin_image/slide_16.png",
-    text: `不同的命題需求，其實適合不同的 AI 工具。這張評比矩陣是我們實際測試各大模型後的心得：ChatGPT 在結構化命題上表現穩定；Claude 擅長長文本處理，適合嚴謹的論述性題目；Gemini 的視覺辨識能力最強，是圖表題的首選；Perplexity 和 Felo 則連網能力出色，適合結合時事新知的命題情境。
-
-工具沒有好壞，端看任務需求，選對工具能省下不少來回修改的時間。`
-  },
-  {
-    title: "拒絕瑕疵：如何設計有效的誘答選項",
-    img: "origin_image/slide_17.png",
-    text: `選擇題的品質，往往取決於干擾選項的設計。常見的試題瑕疵有幾種：正確答案明顯比其他選項長、選項中出現「以上皆是」、或是誘答選項根本不像學生會犯的真實錯誤。
-
-我們可以請 AI 針對學生的常見迷思概念設計誘答，讓每個錯誤選項都能對應到一類真實存在的錯誤認知，這樣的選擇題才具備真正的診斷價值。`
-  },
-  {
-    title: "傳統題目改造：菌根題目升級實踐",
-    img: "origin_image/slide_18.png",
-    text: `這頁的改題案例，清楚說明了「升級」的意義。左邊的傳統題，直接問菌根真菌能提供植物哪些功能，學生只要背過就能作答，無需理解；右邊的素養改版，提供一組共生實驗的數據圖表，考查學生從數據中推論出共生效益的能力。
-
-兩道題考查的是同一個知識點，但測到的思維層次完全不同。這個落差，就是素養命題的核心意義所在。`
-  },
-  {
-    title: "題型轉換：將選擇題變為手寫問答題",
-    img: "origin_image/slide_19.png",
-    text: `防止學生靠消去法猜答案，有一個直接的方法：把選擇題改成問答題。去掉選項，要求學生直接描述菌根共生的功能，並限定作答字數與必須出現的關鍵詞。
-
-這個轉換看似簡單，卻能大幅篩選出真正理解的學生，也同時訓練他們把知識組織成清晰因果邏輯的表達能力。`
-  },
-  {
-    title: "階段式 Rubrics 設計",
-    img: "origin_image/slide_20.png",
-    text: `要讓 AI 批改非選題得精準，Rubrics 的設計是前提。我們建議採用階梯式的給分設計，把一道五分題拆成：概念識別（2分）、推論過程（2分）、結論表達（1分）三個層次，每一層都有明確的評分標準。
-
-把這份規準餵給 AI，再搭配學生的作答照片，批改的結果往往精確得讓人驚訝——也讓評分更客觀、更有一致性。`
-  },
-  {
-    title: "手寫考卷批改：AI 視覺評分實務",
-    img: "origin_image/slide_21.png",
-    text: `這是我們在班上實際操作的批改流程。學生手寫完卷子之後，用手機拍照上傳，AI 根據預先設定的 Rubrics 閱卷：它能識別學生的算式與文字，標出扣分的具體位置，並在最後寫一段針對這位學生錯誤的訂正建議。
-
-整體批改時間縮短了將近三分之二，而每位學生得到的回饋，反而比以前更個別化、更具體。`
-  },
-  {
-    title: "國寫作文批改：AI 等級評閱實踐",
-    img: "origin_image/slide_22.png",
-    text: `語文科的作文批改，也已經能用 AI 輔助完成。只要上傳國寫原卷 PDF，AI 能依據大考中心的評分原則，從內容、結構、表達三個維度進行評閱，給出等第（如 A+、A、B），並附上一段具深度的分析與改善建議。
-
-值得注意的是，對照教師批閱的結果，AI 在等第判定上的一致性相當高，也讓我們對這套流程有了更多信心。`
-  },
-  {
-    title: "Gradescope：師生評量的智慧助手",
-    img: "origin_image/slide_23.png",
-    text: `Gradescope 解決的是一個很具體的痛點：全班卷子改法不一致的問題。它能自動把寫相同算式或相似答案的學生歸成同一組，我們只要改一次，那一組全部學生的分數就同步到位。
-
-更方便的是，事後若想調整某道題的給分標準，全班分數會即時自動更新，不需要手動逐份重改。這在學期末統計時，省下了相當可觀的時間。`
-  },
-  {
-    title: "一鍵解析：考卷詳解與概念庫建立",
-    img: "origin_image/slide_24.png",
-    text: `段考考完後最讓老師頭痛的，往往不是改卷，而是打詳解。現在，把考卷與標準答案給 AI，幾秒內就能產出完整的試題解析，還能自動整理出這份考卷考查的核心概念分布，直接轉化成一份「考前重點複習指引」給學生。
-
-這段時間省下來，可以用在更有價值的學習設計工作上。`
-  },
-  {
-    title: "趨勢透視：115學測自然科深度分析",
-    img: "origin_image/slide_25.png",
-    text: `AI 不只能幫我們出題，也能幫我們分析大考趨勢。我們把 115 年的學測自然科試卷完整丟給 AI，請它分析生物、物理、化學、地科四科的命題難度配置，以及各科高頻考點的分布。
-
-這份分析能幫助我們動態調整教學進度，把力氣放在真正值得深耕的概念，而不是把每個單元都塞進課表裡衝刺。`
-  },
-  {
-    title: "NotebookLM：建立班級專屬解題 Bot",
-    img: "origin_image/slide_26.png",
-    text: `大考前學生有問不完的題目，但我們不可能 24 小時待機解答。NotebookLM 提供了一個優雅的解法：把歷屆試題與詳解上傳後，系統會把這些文件鎖定為唯一的知識庫，AI 的回答只從這份材料中生成，不會胡亂發揮。
-
-學生在課後提問，它就像一個永遠在線的解題助教；它甚至能把試卷內容念給學生聽，對聽覺型學習者特別有幫助。`
-  },
-  {
-    title: "客製化 Bot：GPTs 專案與 Gemini Gem 設定",
-    img: "origin_image/slide_27.png",
-    text: `如果希望出題改題的流程更自動化，可以建立一個「常駐型命題機器人」。在 ChatGPT 中建立 GPTs，或在 Google Gemini 中設定 Gem，把自己的課程講義、命題規格和偏好都固定進去。
-
-以後只要把新的素材或情境文字傳給它，它就會自動按照您的命題習慣生成試題，不需要每次重新寫提示詞，大幅降低重複性的備課負擔。`
-  },
-  {
-    title: "AI 代理人：一鍵生成完整試卷與解答",
-    img: "origin_image/slide_28.png",
-    text: `終極的自動化工作流，是 AI 代理人（Agent）的應用。在 Claude Project 中配置好命題工具與知識庫之後，只要下達一個任務指令，AI 會自己去找相關知識點、選取合適題目、分配配分並完成排版，最後直接輸出學生版試卷 PDF 與附有 Rubrics 的教師詳解版。
-
-整個流程如果順暢，可以在幾分鐘內完成一份完整的段考卷。`
-  },
-  {
-    title: "自動化成果：光合作用與呼吸作用考卷",
-    img: "origin_image/slide_29.png",
-    text: `這是 AI Agent 實際自動產出的成果示範。試卷架構包含了單選、多選、閱讀測驗與非選題，格式完全對齊大考中心規格，每道非選題都附有詳細的 Rubrics。
-
-看到這份成果，我們很難不去想像：這代表的是評量設計工作質地的一場改變——繁重的文書工作從此不再是老師時間的主要消耗，老師的心力可以真正投入在教學設計與學生理解上。`
-  },
-  {
-    title: "AI 與教師的協同進化",
-    img: "origin_image/slide_30.png",
-    text: `走到這裡，我想回到一個更根本的問題：我們用 AI 究竟是為了什麼？不是為了偷懶，也不是為了炫技，而是為了把時間還給自己。
-
-把出題排版、初步批改這些可以標準化的工作交給 AI，把省下來的時間留給探究引導、課堂對話與學生關懷。教育的靈魂從來不在那些繁瑣的文書工作裡，而在師生之間真實的連結之中。`
-  },
-  {
-    title: "您的 AI 落地行動方案：從明天開始",
-    img: "origin_image/slide_31.png",
-    text: `研習結束後，最好的下一步不是「回家再想想」，而是給自己設定三個具體的行動節點。
-
-第一週，用 Kahoot! 或 Quizizz 為某堂課設計一個互動小測驗，感受一下工具的手感；第一個月，嘗試建立一個 Gemini Gem，把自己的命題偏好固定下來；本學期末，為您的學生建立一個 NotebookLM 解題助教。這三步，是從旁觀者變成實踐者最短的路徑。`
-  },
-  {
-    title: "用 AI 賦能教學，釋放更多創造力！",
-    img: "origin_image/slide_32.png",
-    text: `今天的分享就到這裡了。我們為大家準備了今天所有使用的提示詞、工具連結與講義資源，歡迎掃描畫面上的 QR Code 下載帶走。
-
-這套工作流不是麗山的專利，而是每一位願意嘗試的老師都可以建立的系統。期待下次聽到大家分享自己在教學現場的 AI 實踐故事。現在進入 Q&A 時間，歡迎各位老師提問。`
-  }
-];
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  STATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-let current = 0;
-let isPlaying = false;
-let autoTimer = null;
-let autoProgress = null;
-let timerElapsed = 0;
-let isFS = false;
-let fsHideTimer = null;
-
-const TOTAL = slides.length;
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  ELEMENTS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-const mainImg = document.getElementById('mainImg');
-const fsImg = document.getElementById('fs-img');
-const textBody = document.getElementById('textBody');
-const slideBadge = document.getElementById('slideBadge');
-const slideTitleText = document.getElementById('slideTitleText');
-const pageIndicator = document.getElementById('pageIndicator');
-const fsPageIndicator = document.getElementById('fsPageIndicator');
-const progressBar = document.getElementById('progressBar');
-const progressBar2 = document.getElementById('progressBar2');
-const fsProgressBar = document.getElementById('fsProgressBar');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const fsPrevBtn = document.getElementById('fsPrevBtn');
-const fsNextBtn = document.getElementById('fsNextBtn');
-const fsPauseBtn = document.getElementById('fsPauseBtn');
-const playBtn = document.getElementById('playBtn');
-const playIcon = document.getElementById('playIcon');
-const playLabel = document.getElementById('playLabel');
-const fsBtn = document.getElementById('fsBtn');
-const fsOverlay = document.getElementById('fs-overlay');
-const fsControls = document.getElementById('fsControls');
-const thumbStrip = document.getElementById('thumbStrip');
-const autoSpeedSelect = document.getElementById('autoSpeedSelect');
-const fsAutoSpeedSelect = document.getElementById('fsAutoSpeedSelect');
-const timerCircle = document.getElementById('timerCircle');
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  THUMBNAILS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-function buildThumbs() {
-  slides.forEach((s, i) => {
-    const img = document.createElement('img');
-    img.src = s.img;
-    img.className = 'thumb' + (i === 0 ? ' active' : '');
-    img.title = `第 ${i+1} 頁：${s.title}`;
-    img.onclick = () => gotoSlide(i);
-    thumbStrip.appendChild(img);
-  });
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  NAVIGATION
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-function gotoSlide(n, skipResetTimer) {
-  if (n < 0 || n >= TOTAL) return;
-
-  // Fade transition
-  mainImg.classList.add('fading');
-  fsImg.classList.add('fading');
-
-  setTimeout(() => {
-    current = n;
-    const s = slides[current];
-
-    mainImg.src = s.img;
-    mainImg.classList.remove('fading');
-
-    fsImg.src = s.img;
-    fsImg.classList.remove('fading');
-
-    // Text panel
-    slideBadge.textContent = `SLIDE ${String(current+1).padStart(2,'0')}`;
-    slideTitleText.textContent = s.title;
-    // Render paragraphs
-    textBody.innerHTML = s.text.trim().split(/\n\n+/).map(p =>
-      `<p>${p.trim().replace(/\n/g,'<br>')}</p>`
-    ).join('');
-
-    // Indicators
-    const pct = ((current+1)/TOTAL*100).toFixed(1) + '%';
-    progressBar.style.width = pct;
-    progressBar2.style.width = pct;
-    fsProgressBar.style.width = pct;
-    pageIndicator.textContent = `${current+1} / ${TOTAL}`;
-    fsPageIndicator.textContent = `${current+1} / ${TOTAL}`;
-
-    // Buttons
-    prevBtn.disabled = current === 0;
-    nextBtn.disabled = current === TOTAL-1;
-    fsPrevBtn.disabled = current === 0;
-    fsNextBtn.disabled = current === TOTAL-1;
-
-    // Thumbnail
-    document.querySelectorAll('.thumb').forEach((t, i) => t.classList.toggle('active', i===current));
-    // Scroll thumb into view
-    const activThumb = thumbStrip.children[current];
-    if (activThumb) activThumb.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-
-    // If playing, reset timer
-    if (isPlaying && !skipResetTimer) resetAutoTimer();
-
-    // If at end and playing, stop
-    if (current === TOTAL-1 && isPlaying) {
-      // let it stay on last slide
-    }
-  }, 160);
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  AUTO PLAY
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-function getSpeed() {
-  // Use whichever select is active
-  const v = isFS ? parseInt(fsAutoSpeedSelect.value) : parseInt(autoSpeedSelect.value);
-  return isNaN(v) ? 0 : v;
-}
-
-function syncSpeeds() {
-  // Keep both selects in sync
-  autoSpeedSelect.value = fsAutoSpeedSelect.value;
-  fsAutoSpeedSelect.value = autoSpeedSelect.value;
-}
-
-autoSpeedSelect.addEventListener('change', () => {
-  fsAutoSpeedSelect.value = autoSpeedSelect.value;
-  if (isPlaying) resetAutoTimer();
-});
-fsAutoSpeedSelect.addEventListener('change', () => {
-  autoSpeedSelect.value = fsAutoSpeedSelect.value;
-  if (isPlaying) resetAutoTimer();
-});
-
-function startAutoPlay() {
-  const speed = getSpeed();
-  if (speed === 0) { stopAutoPlay(); return; }
-  isPlaying = true;
-  updatePlayUI();
-  resetAutoTimer();
-}
-
-function stopAutoPlay() {
-  isPlaying = false;
-  clearInterval(autoTimer);
-  clearInterval(autoProgress);
-  timerElapsed = 0;
-  timerCircle.style.strokeDashoffset = '88';
-  updatePlayUI();
-}
-
-function resetAutoTimer() {
-  clearInterval(autoTimer);
-  clearInterval(autoProgress);
-  timerElapsed = 0;
-
-  const speed = getSpeed();
-  if (speed === 0) { stopAutoPlay(); return; }
-
-  const circumference = 88;
-  timerCircle.style.strokeDashoffset = String(circumference);
-
-  // Progress ring update every 100ms
-  autoProgress = setInterval(() => {
-    timerElapsed += 0.1;
-    const fraction = timerElapsed / speed;
-    const offset = circumference * (1 - fraction);
-    timerCircle.style.strokeDashoffset = String(Math.max(0, offset));
-  }, 100);
-
-  autoTimer = setInterval(() => {
-    if (current < TOTAL-1) {
-      gotoSlide(current+1, true);
-      timerElapsed = 0;
-      clearInterval(autoProgress);
-      const progressRefresh = setInterval(() => {
-        timerElapsed += 0.1;
-        const fraction = timerElapsed / speed;
-        const offset = circumference * (1 - fraction);
-        timerCircle.style.strokeDashoffset = String(Math.max(0, offset));
-        if (timerElapsed >= speed) clearInterval(progressRefresh);
-      }, 100);
-      autoProgress = progressRefresh;
-    } else {
-      // Loop back or stop
-      stopAutoPlay();
-    }
-  }, speed * 1000);
-}
-
-function togglePlay() {
-  if (isPlaying) {
-    stopAutoPlay();
-  } else {
-    const speed = getSpeed();
-    if (speed === 0) {
-      // Default to 6s if "off"
-      autoSpeedSelect.value = '6';
-      fsAutoSpeedSelect.value = '6';
-    }
-    startAutoPlay();
-  }
-}
-
-function updatePlayUI() {
-  if (isPlaying) {
-    playIcon.textContent = '⏸';
-    playLabel.textContent = '暫停';
-    fsPauseBtn.textContent = '⏸';
-    playBtn.innerHTML = '<span class="auto-indicator"></span><span>暫停</span>';
-  } else {
-    playIcon.textContent = '▶';
-    playLabel.textContent = '播放';
-    fsPauseBtn.textContent = '▶';
-    playBtn.innerHTML = '▶ 播放';
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  FULLSCREEN
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-function enterFullscreen() {
-  isFS = true;
-  fsOverlay.classList.add('active');
-  fsBtn.classList.add('active');
-  fsBtn.textContent = '⛶ 返回';
-  gotoSlide(current, true);
-  // Also request browser fullscreen
-  if (fsOverlay.requestFullscreen) fsOverlay.requestFullscreen().catch(()=>{});
-  setupFsMouseHide();
-}
-
-function exitFullscreen() {
-  isFS = false;
-  fsOverlay.classList.remove('active');
-  fsBtn.classList.remove('active');
-  fsBtn.textContent = '⛶ 全螢幕';
-  fsControls.classList.remove('hidden');
-  clearTimeout(fsHideTimer);
-  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-}
-
-function setupFsMouseHide() {
-  const overlay = document.getElementById('fs-overlay');
-  overlay.addEventListener('mousemove', showFsControls);
-}
-
-function showFsControls() {
-  fsControls.classList.remove('hidden');
-  clearTimeout(fsHideTimer);
-  fsHideTimer = setTimeout(() => {
-    fsControls.classList.add('hidden');
-  }, 3000);
-}
-
-document.addEventListener('fullscreenchange', () => {
-  if (!document.fullscreenElement && isFS) exitFullscreen();
-});
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  KEYBOARD
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
-    e.preventDefault();
-    gotoSlide(current+1);
-  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-    e.preventDefault();
-    gotoSlide(current-1);
-  } else if (e.key === 'Escape' && isFS) {
-    exitFullscreen();
-  } else if (e.key === 'f' || e.key === 'F') {
-    isFS ? exitFullscreen() : enterFullscreen();
-  } else if (e.key === 'p' || e.key === 'P') {
-    togglePlay();
-  }
-});
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  THEME TOGGLE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-let isLight = false;
-function toggleTheme() {
-  isLight = !isLight;
-  document.body.classList.toggle('light', isLight);
-  const icon = document.getElementById('themeIcon');
-  const label = document.getElementById('themeLabel');
-  if (isLight) {
-    icon.textContent = '🌙';
-    label.textContent = '黑底';
-  } else {
-    icon.textContent = '☀️';
-    label.textContent = '白底';
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  INIT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-buildThumbs();
-gotoSlide(0, true);
-</script>
+    <script src="index.js"></script>
 </body>
 </html>
