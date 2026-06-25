@@ -12,12 +12,12 @@ const moduleData = {
             {
                 name: "AI 出題改題解題提示詞工具",
                 desc: "整合了各大 AI 模型出題與解題的系統提示詞，提供直覺的選單介面，讓老師快速複製黃金結構提示詞。",
-                url: "AI出題改題解題提示詞工具.html"
+                url: "https://froglssh.github.io/ai-assisted-exam-pd-workshop/AI出題改題解題提示詞工具.html"
             },
             {
                 name: "AI 生物教學課程提示詞",
                 desc: "專為生物學科設計的課程與教學提示詞工具，涵蓋課程設計、教案撰寫、引導式提問及課堂探究引導心法。",
-                url: "AI生物教學課程提示詞.html"
+                url: "https://froglssh.github.io/ai-assisted-exam-pd-workshop/AI生物教學課程提示詞.html"
             }
         ]
     },
