@@ -5,1053 +5,477 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI 輔助考卷出改解題</title>
 <style>
-  /* ── DARK THEME (default) ── */
-  :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #222636;
-    --accent: #4f7fff;
-    --accent2: #7c5cfc;
-    --text: #e8eaf0;
-    --text-dim: #9ca3b8;
-    --border: #2e3348;
-    --gold: #f5c842;
-    --slide-bg: #000;
-    --thumb-strip-bg: #0f1117;
-  }
-  /* ── LIGHT THEME ── */
-  body.light {
-    --bg: #f0f2f8;
-    --surface: #ffffff;
-    --surface2: #e8eaf2;
-    --accent: #3060dd;
-    --accent2: #6040cc;
-    --text: #1a1d30;
-    --text-dim: #5a6080;
-    --border: #d0d4e8;
-    --gold: #b8860b;
-    --slide-bg: #e0e2ec;
-    --thumb-strip-bg: #e8eaf2;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  /* ── HEADER ── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 24px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .header-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: .04em;
-    background: linear-gradient(135deg, #5b8fff, #a56bff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    white-space: nowrap;
-  }
-  .header-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .ctrl-label { font-size: .8rem; color: var(--text-dim); white-space: nowrap; }
-  .ctrl-select {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: .85rem;
-    cursor: pointer;
-  }
-  .btn {
-    padding: 6px 14px;
-    border-radius: 8px;
-    border: none;
-    font-size: .85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity .15s, transform .1s;
-  }
-  .btn:hover { opacity: .85; transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
-  .btn-play {
-    background: linear-gradient(135deg, #4f7fff, #7c5cfc);
-    color: #fff;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .btn-fs {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; gap: 5px;
-  }
-  .btn-fs.active {
-    background: linear-gradient(135deg, #2a5ccc, #5a3db0);
-    border-color: transparent;
-    color: #fff;
-  }
-
-  /* ── MAIN ── */
-  main {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  /* ── SLIDE PANEL (left 2/3) ── */
-  .slide-panel {
-    flex: 0 0 66.666%;
-    display: flex;
-    flex-direction: column;
-    background: var(--slide-bg);
-    position: relative;
-    overflow: hidden;
-  }
-  .slide-img-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    overflow: hidden;
-  }
-  .slide-img-wrap img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 6px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.6);
-    transition: opacity .35s ease;
-    display: block;
-  }
-  .slide-img-wrap img.fading { opacity: 0; }
-
-  /* ── TEXT PANEL (right 1/3) ── */
-  .text-panel {
-    flex: 0 0 33.333%;
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-    border-left: 1px solid var(--border);
-    overflow: hidden;
-  }
-  .text-header {
-    padding: 14px 20px 10px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .slide-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #4f7fff33, #7c5cfc33);
-    border: 1px solid #4f7fff55;
-    color: var(--accent);
-    font-size: .78rem;
-    font-weight: 700;
-    padding: 2px 10px;
-    border-radius: 20px;
-    letter-spacing: .06em;
-    margin-bottom: 6px;
-  }
-  .slide-title-text {
-    font-size: 1.3rem;
-    font-weight: 700;
-    line-height: 1.5;
-    color: var(--text);
-  }
-  .text-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 24px 24px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-  .text-body p {
-    font-size: 1.3rem;
-    line-height: 2.05;
-    color: var(--text);
-    margin-bottom: 20px;
-  }
-  .text-body p:last-child { margin-bottom: 0; }
-
-  /* ── BOTTOM NAV ── */
-  .bottom-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 10px 20px;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
-    flex-shrink: 0;
-  }
-  .nav-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    width: 36px; height: 36px;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .15s, transform .1s;
-  }
-  .nav-btn:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
-  .nav-btn:active:not(:disabled) { transform: scale(.95); }
-  .nav-btn:disabled { opacity: .3; cursor: not-allowed; }
-  .page-indicator {
-    font-size: .9rem;
-    color: var(--text-dim);
-    min-width: 80px;
-    text-align: center;
-    font-weight: 600;
-  }
-  .progress-bar-wrap {
-    flex: 1;
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    max-width: 200px;
-  }
-  .progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #4f7fff, #7c5cfc);
-    border-radius: 2px;
-    transition: width .3s ease;
-  }
-
-  /* ── THUMBNAIL STRIP ── */
-  .thumb-strip {
-    display: flex;
-    gap: 6px;
-    padding: 8px 16px;
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    overflow-x: auto;
-    flex-shrink: 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-    max-height: 110px;
-    padding: 10px 16px;
-  }
-  .thumb {
-    flex-shrink: 0;
-    width: 116px;
-    height: 82px;
-    border-radius: 5px;
-    object-fit: cover;
-    cursor: pointer;
-    border: 2px solid transparent;
-    opacity: .55;
-    transition: opacity .15s, border-color .15s, transform .15s;
-  }
-  .thumb:hover { opacity: .85; transform: scaleY(1.04); }
-  .thumb.active { border-color: var(--accent); opacity: 1; }
-
-  /* ── AUTHOR INFO (in header) ── */
-  .header-author {
-    font-size: .82rem;
-    color: var(--text-dim);
-    letter-spacing: .04em;
-    white-space: nowrap;
-    border-left: 1px solid var(--border);
-    padding-left: 14px;
-    margin-left: 4px;
-  }
-  .header-author strong { color: var(--gold); font-weight: 700; }
-
-  /* ── FULLSCREEN OVERLAY ── */
-  #fs-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #000;
-    z-index: 9999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  #fs-overlay.active { display: flex; }
-  #fs-img {
-    max-width: 100vw;
-    max-height: calc(100vh - 80px);
-    object-fit: contain;
-    transition: opacity .35s ease;
-    display: block;
-  }
-  #fs-img.fading { opacity: 0; }
-  .fs-controls {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    padding: 12px 24px;
-    background: rgba(0,0,0,.75);
-    backdrop-filter: blur(8px);
-    transition: opacity .3s;
-  }
-  .fs-controls.hidden { opacity: 0; pointer-events: none; }
-  .fs-nav-btn {
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.2);
-    color: #fff;
-    width: 40px; height: 40px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .15s;
-  }
-  .fs-nav-btn:hover:not(:disabled) { background: rgba(255,255,255,.25); }
-  .fs-nav-btn:disabled { opacity: .25; cursor: not-allowed; }
-  .fs-page { color: rgba(255,255,255,.75); font-size: .9rem; min-width: 70px; text-align: center; }
-  .fs-exit-btn {
-    position: fixed;
-    top: 14px; right: 18px;
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.2);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: .82rem;
-    cursor: pointer;
-    z-index: 10001;
-    transition: background .15s;
-  }
-  .fs-exit-btn:hover { background: rgba(255,255,255,.25); }
-  .fs-auto-label {
-    color: rgba(255,255,255,.6);
-    font-size: .8rem;
-    white-space: nowrap;
-  }
-  .fs-ctrl-select {
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.2);
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: .82rem;
-    cursor: pointer;
-  }
-  .fs-progress {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: rgba(255,255,255,.1);
-    z-index: 10001;
-  }
-  .fs-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #4f7fff, #a56bff);
-    transition: width .3s ease;
-  }
-  /* Auto-play timer ring */
-  .timer-ring {
-    position: relative;
-    width: 32px; height: 32px;
-    flex-shrink: 0;
-  }
-  .timer-ring svg { transform: rotate(-90deg); }
-  .timer-ring circle {
-    fill: none;
-    stroke-width: 3;
-  }
-  .timer-bg { stroke: rgba(255,255,255,.15); }
-  .timer-fill { stroke: #4f7fff; stroke-dasharray: 88; stroke-dashoffset: 88; transition: stroke-dashoffset .1s linear; }
-
-  /* Thumbnail strip bg */
-  .thumb-strip { background: var(--thumb-strip-bg); }
-
-  /* Scrollbar style */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  /* ── THEME TOGGLE BUTTON ── */
-  .btn-theme {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; gap: 6px;
-    font-size: .85rem;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background .2s, color .2s, border-color .2s, transform .1s;
-    white-space: nowrap;
-  }
-  .btn-theme:hover { opacity: .85; transform: translateY(-1px); }
-  body.light .btn-theme {
-    background: #1a1d27;
-    color: #e8eaf0;
-    border-color: #3a4060;
-  }
-
-  /* Auto play indicator */
-  .auto-indicator {
-    display: inline-block;
-    width: 8px; height: 8px;
-    background: #4fff8a;
-    border-radius: 50%;
-    margin-right: 4px;
-    animation: pulse-dot 1s infinite;
-  }
-  @keyframes pulse-dot {
-    0%,100% { opacity: 1; }
-    50% { opacity: .3; }
-  }
+:root{
+  --bg:#f4f5f7; --panel:#ffffff; --text:#1a1a1a; --sub:#4a4a4a;
+  --accent:#2563eb; --accent2:#1d4ed8; --border:#e2e5ea; --shadow:rgba(0,0,0,.10);
+  --barbg:#ffffff; --thumbbg:#eceef2; --thumbactive:#2563eb;
+}
+html[data-theme="dark"]{
+  --bg:#0d0f14; --panel:#161a22; --text:#f3f4f6; --sub:#c2c7d0;
+  --accent:#60a5fa; --accent2:#3b82f6; --border:#2a2f3a; --shadow:rgba(0,0,0,.5);
+  --barbg:#12151c; --thumbbg:#1f2430; --thumbactive:#60a5fa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+  background:var(--bg); color:var(--text);
+  height:100vh; display:flex; flex-direction:column; overflow:hidden;
+  transition:background .3s,color .3s;
+}
+/* ---- Top bar ---- */
+header{
+  display:flex; align-items:center; gap:14px; padding:12px 20px;
+  background:var(--barbg); border-bottom:1px solid var(--border);
+  box-shadow:0 2px 10px var(--shadow); z-index:20; flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto}
+.logo{
+  width:40px;height:40px;border-radius:11px;flex:none;
+  background:linear-gradient(135deg,#2563eb,#7c3aed);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+h1{font-size:22px;font-weight:800;letter-spacing:.5px;line-height:1.1}
+.subttl{font-size:12px;color:var(--sub);font-weight:500}
+.controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.btn{
+  border:1px solid var(--border); background:var(--panel); color:var(--text);
+  padding:9px 15px; border-radius:10px; font-size:14px; font-weight:600;
+  cursor:pointer; display:inline-flex; align-items:center; gap:7px;
+  transition:transform .12s,background .2s,border-color .2s;
+}
+.btn:hover{transform:translateY(-1px);border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.sec-input{
+  display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub);
+  background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:6px 11px;
+}
+.sec-input input{
+  width:52px;border:none;background:transparent;color:var(--text);
+  font-size:15px;font-weight:700;text-align:center;outline:none;
+}
+.chk{
+  display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--sub);
+  background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:7px 12px;cursor:pointer;user-select:none;
+}
+.chk input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.sec-input select{
+  border:none;background:transparent;color:var(--text);
+  font-size:13px;font-weight:700;outline:none;cursor:pointer;max-width:170px;
+}
+.sec-input select option{color:#111}
+/* ---- Main split ---- */
+main{flex:1;display:flex;min-height:0;position:relative}
+.slide-pane{
+  flex:0 0 66%; max-width:66%; background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:26px; position:relative; overflow:hidden;
+}
+.slide-pane img{
+  max-width:100%;max-height:100%;object-fit:contain;
+  border-radius:12px; box-shadow:0 10px 34px var(--shadow);
+  background:#fff;
+}
+.text-pane{
+  flex:1; min-width:0; background:var(--panel); border-left:1px solid var(--border);
+  padding:24px 26px; overflow-y:auto; display:flex;flex-direction:column;
+}
+.pagechip{
+  align-self:flex-start; font-size:12px; font-weight:700; color:#fff;
+  background:var(--accent); padding:3px 12px; border-radius:20px; margin-bottom:12px;
+}
+.text-pane h2{
+  font-size:22px; font-weight:800; line-height:1.3; margin-bottom:14px;
+  color:var(--text); border-bottom:3px solid var(--accent); padding-bottom:11px;
+}
+.text-pane p{
+  font-size:16px; line-height:1.7; color:var(--sub); margin-bottom:13px;
+  letter-spacing:.2px;
+}
+.text-pane p:last-child{margin-bottom:0}
+/* Nav arrows over slide */
+.nav-arrow{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:48px;height:48px;border-radius:50%;border:none; cursor:pointer;
+  background:rgba(37,99,235,.85); color:#fff; font-size:24px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.3); transition:background .2s,transform .12s; z-index:6;
+}
+.nav-arrow:hover{background:var(--accent2);transform:translateY(-50%) scale(1.08)}
+.nav-arrow.prev{left:16px}
+.nav-arrow.next{right:16px}
+/* ---- Thumbnail strip ---- */
+.filmstrip{
+  background:var(--barbg); border-top:1px solid var(--border);
+  padding:9px 12px; display:flex; align-items:center; gap:10px; z-index:15;
+}
+.strip-scroll{
+  display:flex; gap:8px; overflow-x:auto; overflow-y:hidden; padding:3px 2px 7px;
+  scroll-behavior:smooth; flex:1;
+}
+.strip-scroll::-webkit-scrollbar{height:8px}
+.strip-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.thumb{
+  flex:none; width:118px; height:67px; border-radius:7px; cursor:pointer;
+  border:3px solid transparent; background:var(--thumbbg); position:relative;
+  overflow:hidden; transition:border-color .15s,transform .12s;
+}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb:hover{transform:translateY(-2px)}
+.thumb.active{border-color:var(--thumbactive)}
+.thumb .tn{
+  position:absolute;left:0;bottom:0;background:rgba(0,0,0,.62);color:#fff;
+  font-size:11px;font-weight:700;padding:1px 6px;border-top-right-radius:6px;
+}
+.jump{
+  display:flex;align-items:center;gap:7px;font-size:13px;color:var(--sub);flex:none;
+}
+.jump input{
+  width:56px;padding:6px;border-radius:8px;border:1px solid var(--border);
+  background:var(--panel);color:var(--text);text-align:center;font-size:14px;font-weight:700;
+}
+/* ---- Fullscreen presentation ---- */
+#fs{
+  position:fixed;inset:0;background:#000;z-index:100;display:none;
+  align-items:center;justify-content:center;
+}
+#fs.show{display:flex}
+#fs img{max-width:100%;max-height:100%;object-fit:contain}
+.fs-ui{
+  position:fixed;top:18px;right:18px;display:flex;gap:10px;align-items:center;
+  z-index:110; opacity:.25; transition:opacity .25s;
+}
+#fs:hover .fs-ui{opacity:1}
+.fs-btn{
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;
+  padding:9px 14px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;
+  backdrop-filter:blur(6px);
+}
+.fs-btn:hover{background:rgba(255,255,255,.28)}
+.fs-count{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  color:#fff;background:rgba(0,0,0,.5);padding:6px 18px;border-radius:20px;
+  font-size:15px;font-weight:700;z-index:110;opacity:.3;transition:opacity .25s;
+}
+#fs:hover .fs-count{opacity:1}
+.fs-arrow{
+  position:fixed;top:50%;transform:translateY(-50%);width:56px;height:56px;border-radius:50%;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);color:#fff;
+  font-size:28px;cursor:pointer;z-index:110;opacity:.2;transition:opacity .25s;
+  display:flex;align-items:center;justify-content:center;
+}
+#fs:hover .fs-arrow{opacity:.85}
+.fs-arrow.p{left:22px}.fs-arrow.n{right:22px}
+/* ---- Footer ---- */
+footer{
+  background:var(--barbg);border-top:1px solid var(--border);
+  text-align:center;padding:8px;font-size:13px;color:var(--sub);font-weight:600;letter-spacing:.5px;
+}
+footer b{color:var(--accent);font-weight:800}
+/* ---- Responsive ---- */
+@media(max-width:860px){
+  main{flex-direction:column}
+  .slide-pane{flex:0 0 52%;max-width:100%;padding:14px}
+  .text-pane{border-left:none;border-top:1px solid var(--border);padding:16px}
+  .text-pane h2{font-size:19px}
+  .text-pane p{font-size:15px;line-height:1.65}
+  h1{font-size:18px}
+  .thumb{width:92px;height:52px}
+}
+.playing-badge{
+  position:absolute;top:16px;left:16px;background:rgba(37,99,235,.9);color:#fff;
+  padding:5px 13px;border-radius:20px;font-size:13px;font-weight:700;z-index:6;display:none;
+}
+.playing-badge.show{display:block}
 </style>
 </head>
-<body>
-
-<!-- HEADER -->
+<body data-theme="light">
 <header>
-  <div class="header-title">🎓 AI 輔助考卷出改解題</div>
-  <div class="header-author">臺北市立麗山高中 ｜ <strong>林獻升 老師</strong> 製作</div>
-  <div class="header-controls" style="margin-left:auto;">
-    <span class="ctrl-label">自動播放：</span>
-    <select class="ctrl-select" id="autoSpeedSelect">
-      <option value="0">關閉</option>
-      <option value="4">4 秒</option>
-      <option value="6" selected>6 秒</option>
-      <option value="8">8 秒</option>
-      <option value="12">12 秒</option>
-      <option value="20">20 秒</option>
-    </select>
-    <button class="btn btn-play" id="playBtn" onclick="togglePlay()">
-      <span id="playIcon">▶</span> <span id="playLabel">播放</span>
-    </button>
-    <button class="btn btn-fs" id="fsBtn" onclick="enterFullscreen()">
-      ⛶ 全螢幕
-    </button>
-    <button class="btn-theme" id="themeBtn" onclick="toggleTheme()" title="切換背景色">
-      <span id="themeIcon">☀️</span><span id="themeLabel">白底</span>
-    </button>
+  <div class="brand">
+    <div class="logo">✈️</div>
+    <div>
+      <h1>AI 輔助考卷出改解題</h1>
+      <div class="subttl">研習教學簡報 · 圖文對照瀏覽</div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="sec-input" title="設定自動播放秒數">
+      <span>秒數</span><input id="secIn" type="number" min="1" max="120" value="8"><span>秒</span>
+    </div>
+    <button class="btn" id="autoBtn">▶ 自動播放</button>
+    <label class="chk" title="開啟後，自動播放會唸完整頁旁白才換頁；關閉則依上方秒數換頁">
+      <input type="checkbox" id="waitSpeak" checked> 朗讀完才換頁
+    </label>
+    <div class="sec-input" title="選擇朗讀語音（清單依你電腦已安裝的語音而定，建議挑「Google」或加強版語音最自然）">
+      <span>語音</span><select id="voiceSel"></select>
+    </div>
+    <div class="sec-input" title="設定朗讀語速">
+      <span>語速</span><input id="rateIn" type="number" min="0.5" max="2" step="0.05" value="0.95"><span>×</span>
+    </div>
+    <div class="sec-input" title="設定音調高低（1 為原音，低一點較沉穩、高一點較活潑）">
+      <span>音調</span><input id="pitchIn" type="number" min="0.5" max="1.5" step="0.05" value="1.0"><span>♪</span>
+    </div>
+    <button class="btn" id="speakBtn">🔊 朗讀旁白</button>
+    <button class="btn primary" id="fsBtn">⛶ 全螢幕播放</button>
+    <button class="btn" id="themeBtn">🌙 深色</button>
   </div>
 </header>
 
-<!-- MAIN AREA -->
 <main>
-  <!-- Left: Slide image -->
-  <div class="slide-panel">
-    <div class="slide-img-wrap">
-      <img id="mainImg" src="" alt="Slide">
-    </div>
-    <!-- Thumbnail strip -->
-    <div class="thumb-strip" id="thumbStrip"></div>
-  </div>
-
-  <!-- Right: Text panel -->
-  <div class="text-panel">
-    <div class="text-header">
-      <div class="slide-badge" id="slideBadge">SLIDE 01</div>
-      <div class="slide-title-text" id="slideTitleText"></div>
-    </div>
-    <div class="text-body" id="textBody"></div>
-  </div>
+  <section class="slide-pane">
+    <div class="playing-badge" id="badge">自動播放中…</div>
+    <button class="nav-arrow prev" id="prev">‹</button>
+    <img id="mainImg" src="" alt="投影片">
+    <button class="nav-arrow next" id="next">›</button>
+  </section>
+  <section class="text-pane" id="textPane">
+    <span class="pagechip" id="chip">第 1 / 70 頁</span>
+    <h2 id="title"></h2>
+    <div id="body"></div>
+  </section>
 </main>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <button class="nav-btn" id="prevBtn" onclick="gotoSlide(current-1)" title="上一頁">◀</button>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar" id="progressBar"></div>
+<div class="filmstrip">
+  <div class="jump">
+    <span>跳頁</span>
+    <input id="jumpIn" type="number" min="1" max="70" value="1">
+    <span>/ 70</span>
   </div>
-  <div class="page-indicator" id="pageIndicator">1 / 32</div>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar" id="progressBar2"></div>
-  </div>
-  <button class="nav-btn" id="nextBtn" onclick="gotoSlide(current+1)" title="下一頁">▶</button>
+  <div class="strip-scroll" id="strip"></div>
 </div>
 
-<!-- FULLSCREEN OVERLAY -->
-<div id="fs-overlay">
-  <div class="fs-progress"><div class="fs-progress-bar" id="fsProgressBar"></div></div>
-  <button class="fs-exit-btn" onclick="exitFullscreen()">✕ 離開全螢幕</button>
-  <img id="fs-img" src="" alt="Slide Fullscreen">
-  <div class="fs-controls" id="fsControls">
-    <button class="fs-nav-btn" id="fsPrevBtn" onclick="gotoSlide(current-1)">◀</button>
-    <div class="timer-ring" id="timerRing" title="自動播放進度">
-      <svg width="32" height="32" viewBox="0 0 32 32">
-        <circle class="timer-bg" cx="16" cy="16" r="14"/>
-        <circle class="timer-fill" id="timerCircle" cx="16" cy="16" r="14"/>
-      </svg>
-    </div>
-    <span class="fs-page" id="fsPageIndicator">1 / 32</span>
-    <div class="timer-ring" style="visibility:hidden"></div><!-- spacer -->
-    <button class="fs-nav-btn" id="fsNextBtn" onclick="gotoSlide(current+1)">▶</button>
-    <span class="fs-auto-label" style="margin-left:12px">自動播放：</span>
-    <select class="fs-ctrl-select" id="fsAutoSpeedSelect">
-      <option value="0">關閉</option>
-      <option value="4">4 秒</option>
-      <option value="6" selected>6 秒</option>
-      <option value="8">8 秒</option>
-      <option value="12">12 秒</option>
-      <option value="20">20 秒</option>
-    </select>
-    <button class="fs-nav-btn" id="fsPauseBtn" onclick="togglePlay()" title="播放/暫停" style="font-size:.9rem">▶</button>
+<footer>臺北市立麗山高中 ｜ <b>林獻升老師</b> 製作</footer>
+
+<!-- Fullscreen -->
+<div id="fs">
+  <button class="fs-arrow p" id="fsPrev">‹</button>
+  <img id="fsImg" src="" alt="">
+  <button class="fs-arrow n" id="fsNext">›</button>
+  <div class="fs-ui">
+    <button class="fs-btn" id="fsSpeak">🔊 朗讀旁白</button>
+    <button class="fs-btn" id="fsAuto">▶ 自動播放</button>
+    <button class="fs-btn" id="fsExit">✕ 離開全螢幕</button>
   </div>
+  <div class="fs-count" id="fsCount"></div>
 </div>
 
 <script>
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  SLIDE DATA
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-const slides = [
-  {
-    title: "AI助教時代的教學評量革命",
-    img: "origin_image/slide_01.png",
-    text: `今天這場研習的主軸，藏著一個在教學現場醞釀已久的問題：面對 108 課綱的素養評量浪潮，我們能不能讓 AI 成為真正有用的助教，而不只是一個花俏的科技玩具？
+const SLIDES = [{"n": 1, "title": "AI助教時代的教學評量革命：出題、改題與解題的智慧工作流", "paras": ["各位老師好！歡迎大家來到今天的研習。今天我們的主題是「AI 助教時代的教學評量革命」。在 108 課綱下，相信每一位老師都深刻感受到，設計一份好的素養考卷或批改非選擇題是多麼沉重的負擔。今天，我將結合自己在麗山高中的生物教學實踐，跟大家分享如何利用生成式 AI，把這些繁重的工作轉化為智慧化、自動化的工作流。"]}, {"n": 2, "title": "今天研習的四大核心模組", "paras": ["我們今天的研習將分為四個部分：首先是學理基礎，釐清什麼是素養評量；第二部分是 AI 出題實務，介紹多模態與實驗出題；第三部分是智慧批改，看 AI 如何幫我們改手寫非選題與國寫作文；最後則是 AI 解題，教大家如何建立專屬的 NotebookLM 解題助教。"]}, {"n": 3, "title": "108課綱下，教師的「評量深淵」", "paras": ["在進入技術前，我們先談談痛點。108課綱要求情境化命題，老師們要找素材、畫圖表、打長文，出一份段考卷動輒花上數十小時。更別說手寫題和作文，改起來肩膀痠痛，又難以給每位學生詳細的回饋。大考趨勢年年變，這就是我們的「評量深淵」。"]}, {"n": 4, "title": "教師與 AI 協同的四個應用層次", "paras": ["為了解決這個問題，我整理了這張學習地圖。我們對 AI 的應用可以分為四個層級：從 Level 1 最簡單的教材 PDF 一鍵變題庫，到 Level 2 學會提示詞改造舊題，Level 3 能夠融入影片與實驗，一直到 Level 4 能使用視覺辨識與 AI 代理人自動出卷。今天我們就會一關一關來練習。"]}, {"n": 5, "title": "素養試題的四大靈魂要素", "paras": ["進入模組一，我們談談素養題。素養導向評量有四個要素：情境脈絡、整合運用、能力表現、態度與價值。最重要的是情境不能是裝飾性的。如果把情境遮住，學生還能用公式做出來，那就是「假素養題」，必須重新改造。"]}, {"n": 6, "title": "國中教育會考：三多一沒有", "paras": ["我們看大考的格局。國中會考的靈魂在於「三多一沒有」：文字多、圖表多、情境多，但沒有複雜的計算。以自然科為例，圖表題佔了七到八成，因此我們命題時，也要著重訓練學生的圖表解讀與變因控制能力。"]}, {"n": 7, "title": "大學學測：學術情境化與混合題型", "paras": ["再看學測。學測自然科或國語文的字數極多，學生面臨極大的閱讀壓力。它的特色是學術情境化，會引入科普摘要甚至是學術論文。最關鍵的是引入了混合題組，將選擇與非選擇手寫題合在同一個情境下，層層遞進。"]}, {"n": 8, "title": "分科測驗：鷹架式題組與第一性原理", "paras": ["分科測驗則是最高難度的科學思辨。它考查學生回歸學理第一性原理的能力，常引入陌生情境（如最新的減重藥物 GLP-1、不可能的漢堡肉）。非選題配分大增，需要學生寫出極為清晰的因果邏輯鏈。"]}, {"n": 9, "title": "命題計畫：認知層次與難度配置", "paras": ["那麼，我們段考命題該如何規劃？我建議對齊布魯姆認知層次，將素養題主力放在 C3（應用）與 C4（分析）。這張表格提供大家段考、會考與學測在易、中偏易、中偏難、難題的比例建議，讓我們命題有據可依。"]}, {"n": 10, "title": "一鍵生成：Kahoot! AI 與 Quizizz AI", "paras": ["進入模組二。如果您只有 10 分鐘，想要做課堂複習小考，可以使用 Level 1 工具。Kahoot! AI 能直接讀取您的講義 PDF，一鍵生出互動題；Quizizz AI (Wayground) 還支援把 YouTube 影片或網頁直接轉成小考，非常省時。"]}, {"n": 11, "title": "智慧診斷：Edcafe AI 與個人化學習回饋", "paras": ["除了遊戲化小考，Edcafe AI 更上了一層樓。學生答題後，AI 會根據學生特定的錯誤答案，給予個人化的診斷建議（AI Feedback），幫助學生釐清盲點，引導他們思考。這比只給標準答案更具教學價值。"]}, {"n": 12, "title": "如何與 AI 對話？出題提示詞的黃金結構", "paras": ["如果我們要用 ChatGPT 或 Gemini 出更精準的段考題，就需要掌握提示詞結構。我整理的黃金結構是：設定角色、給予具體任務、指定格式，以及設定目標與限制。我們要把 AI 當成一個實習同事，下清晰的指令。"]}, {"n": 13, "title": "影音命題：鹽沼天牛生存機制測驗生成", "paras": ["這是一個 Level 3 實作範例。我發現了一個介紹鹽沼天牛不進食機制的有趣 YouTube 影片。我讓 AI 擷取逐字稿，提取出生物學的能量代謝情境，一鍵產生了結構清晰的閱讀題組。這讓課外科普新知能立刻融入測驗。"]}, {"n": 14, "title": "實驗命題：將課本實驗轉為探究題組", "paras": ["我們實驗課也可以這樣命題。只要將課本的實驗步驟（如有機物檢測、酵素實驗）丟給 AI，它就能解讀出操縱變因和控制變因，並命製考查實驗設計缺陷或數據解讀的探究題。出出來的題目極度貼近實際操作。"]}, {"n": 15, "title": "視覺出題：讓圖表、構造圖自動出題", "paras": ["很多老師問，圖表題該怎麼辦？使用 Gemini 等具備強大視覺辨識的模型，我們可以直接截圖課本的解剖構造圖（如心臟）或數據圖表，請 AI 辨識圖中標記並針對該結構出題。這解決了過去辛苦找圖、描圖排版的困擾。"]}, {"n": 16, "title": "出題工具箱：各大 AI 模型能力評比", "paras": ["工欲善其事，必先利其器。這張評比矩陣是我測試各大模型的總結：ChatGPT 適合結構化命題，Claude 是長文本與嚴謹命題的最佳選擇，Gemini 視覺能力最強，而 Perplexity / Felo 則最適合時事與連網搜尋命題。"]}, {"n": 17, "title": "拒絕瑕疵：如何設計有效的誘答選項", "paras": ["出選擇題最難的是寫干擾選項。我們可以用 AI 幫忙預防試題瑕疵（IWF），例如正確選項明顯偏長、出現「以上皆是」等。我們要請 AI 針對學生的真實迷思概念來設計「似真性」高的錯誤選項，達到診斷效果。"]}, {"n": 18, "title": "傳統題目改造：菌根題目升級實踐", "paras": ["進入模組三，改題實務。我們看這頁的前後對比：左邊是傳統題，直接考學生死記硬背菌根真菌的功能；右邊是我們升級後的素養題，提供植物共生實驗的數據圖表，考查學生推理分析能力。這樣的升級能真正測出理解。"]}, {"n": 19, "title": "題型轉換：將選擇題變為手寫問答題", "paras": ["為了防止學生用消去法猜答案，我們也可以把選擇題改成問答申論題。去掉選項，直接要學生描述共生菌根的功能，並限定作答字數與關鍵詞。這能大幅訓練學生的邏輯因果關係與科學表達能力。"]}, {"n": 20, "title": "階段式 Rubrics 設計", "paras": ["為了讓非選題批改客觀公正，我們必須使用標準化的 Rubrics（評分規準）。我建議將總分拆解為階梯，例如：概念識別 (2分)、推論過程 (2分)、結論表達 (1分)。將這個規準餵給 AI，批改就能極其精確。"]}, {"n": 21, "title": "手寫考卷批改：AI 視覺評分實務", "paras": ["這是我在班上的真實批改示範。學生手寫考卷寫完，拍照上傳給 AI，AI 根據我們設定的 Rubrics，能看懂學生的算式和文字，給出分數並用紅字標記出他錯在哪裡，最後寫下一段溫暖的訂正建議。改卷時間縮短了三分之二。"]}, {"n": 22, "title": "國寫作文批改：AI 等級評閱實踐", "paras": ["不僅自然科，語文科作文也可以！只要上傳國寫原卷 PDF，AI 能依據大考中心評分原則，從內容、結構、表達三維度評閱，精確給出等第（如 A 等），並寫出極具深度的分析與建議。這讓作文改卷不再是噩夢。"]}, {"n": 23, "title": "Gradescope：師生評量的智慧助手", "paras": ["在這裡我也強烈推薦 Gradescope 這個軟體。它可以幫我們把全班考卷智慧分類，例如寫相同算式的學生歸在同一組，我們只要改一次，就能批改那一組所有學生；若隨時想改 Rubrics 配分，全班分數會自動同步更新。"]}, {"n": 24, "title": "一鍵解析：考卷詳解與概念庫建立", "paras": ["進入模組四，解題實務。段考後老師最痛苦的就是打考卷詳解。現在，只要把考卷和標準答案給 AI，一秒就能產出詳細的解析，還能自動整理出整份考卷考查的核心概念分佈，直接生出「考前重點複習指引」給學生。"]}, {"n": 25, "title": "趨勢透視：115學測自然科深度分析", "paras": ["我們也可以拿 AI 來分析大考趨勢。例如，我將 115 年學測自然科試卷餵給 AI，它立刻分析出生物、物理、化學、地科的命題難度配置，並指出高頻核心考點。這有助於我們動態調整下學期的教學進度。"]}, {"n": 26, "title": "NotebookLM：建立班級專屬解題 Bot", "paras": ["大考前，學生有問不完的題目怎麼辦？我們可以把歷屆試題與詳解上傳到 NotebookLM。它會將這些文件鎖定為唯一知識庫，避免 AI 瞎編。學生上線提問，它就像個 24 小時在線的解題助教，甚至能把試卷念給學生聽。"]}, {"n": 27, "title": "客製化 Bot：GPTs 專案與 Gemini Gem 設定", "paras": ["如果您想讓出題改題更自動化，可以建立專屬 Bot。在 ChatGPT 中建立 GPTs，或者在 Google Gemini 中設定 Gem，把您的講義與提示詞固定下來。以後只要把材料傳給它，它就會自動用您的命題規格出題。"]}, {"n": 28, "title": "AI 代理人：一鍵生成完整試卷與解答", "paras": ["未來的終極工作流是 AI 代理人（Agent）。在 Claude Project 中配置 MCP 命題工具，您只要下達指令，AI 會自己去找知識庫、挑選題目、自動分配配分並排版，最後一秒吐出學生版試卷 PDF 與教師詳解版。"]}, {"n": 29, "title": "自動化成果：光合作用與呼吸作用考卷", "paras": ["這就是 AI Agent 自動產出的實物成果。試卷架構極其完整，包含了單選、多選、閱讀測驗與非選題，格式完全對齊大考中心規格，且附帶了極為詳細的 Rubrics。這代表了評量設計的一場寧靜革命。"]}, {"n": 30, "title": "AI 與教師的協同進化", "paras": ["最後，我想分享我的評量哲學。我們用 AI 不是為了偷懶，而是為了解放時間。把重複、繁重、文書性質的工作（如出題排版、初步改卷）交給 AI；把我們的時間留給探究引導、情感連結與學生關懷。這才是教育的靈魂。"]}, {"n": 31, "title": "您的 AI 落地行動方案：從明天開始", "paras": ["研習結束後，要怎麼開始？我建議大家建立這三個行動節點：第一週先用 Kahoot!/Quizizz 快速出個課堂小考；第一個月為自己設定一個出題的 Gemini Gem；本學期末嘗試用 NotebookLM 為學生打造一個解題助教。"]}, {"n": 32, "title": "用 AI 賦能教學，釋放更多創造力！", "paras": ["今天的分享就到這裡。我們為各位老師準備了今天所有的提示詞、指令與講義資源，大家可以掃描畫面上的 QR Code 下載。謝謝大家，也期待與大家共同開啟 AI 助教評量的新紀元！現在我們進入 Q&A 交流時間。"]}];
+const imgPath = n => `origin_image/slide_${String(n).padStart(2,'0')}.png`;
+let cur = 0;              // 0-indexed
+let autoTimer = null;     // inline autoplay
+let fsTimer = null;       // fullscreen autoplay
 
-從麗山生物科的教學現場出發，今天把這段走過來的實踐經驗直接分享給大家，希望帶回去就能用。`
-  },
-  {
-    title: "今天研習的四大核心模組",
-    img: "origin_image/slide_02.png",
-    text: `今天的研習設計了四個模組，彼此之間有內在的邏輯串連。
+const $ = id => document.getElementById(id);
+const mainImg=$('mainImg'), titleEl=$('title'), bodyEl=$('body'),
+      chip=$('chip'), strip=$('strip'), jumpIn=$('jumpIn'),
+      fsImg=$('fsImg'), fsCount=$('fsCount'), fs=$('fs'), badge=$('badge');
 
-我們從學理基礎出發，先確立「什麼才算真正意義上的素養評量」；接著進入 AI 出題實務，實際看看多模態材料與實驗情境如何快速轉化成考題；第三個模組聚焦在智慧批改，包括手寫非選題與國寫作文的 AI 評閱流程；最後，我們一起建立 NotebookLM 解題助教，讓這套工作流完整落地在班級現場。`
-  },
-  {
-    title: "108課綱下，教師的「評量深淵」",
-    img: "origin_image/slide_03.png",
-    text: `108 課綱對情境化命題的要求，是一把雙面刃。它讓評量變得更真實，但也讓出題變得極度耗時——找素材、處理圖表、撰寫長篇情境文，一份段考卷動輒花上整個週末。
+// build thumbnails
+SLIDES.forEach((s,i)=>{
+  const d=document.createElement('div');
+  d.className='thumb'; d.dataset.i=i;
+  d.innerHTML=`<img loading="lazy" src="${imgPath(s.n)}"><span class="tn">${s.n}</span>`;
+  d.onclick=()=>{ go(i); };
+  strip.appendChild(d);
+});
+const thumbs=[...strip.children];
 
-更別說手寫題的批改，改到肩膀痠痛，每位學生卻只能得到一個分數，幾乎沒有個別的學習回饋。這就是我們所說的「評量深淵」：好的設計理念，卻因工作量過重而難以真正落實。`
-  },
-  {
-    title: "教師與 AI 協同的四個應用層次",
-    img: "origin_image/slide_04.png",
-    text: `面對這個困境，我們整理了一張學習地圖，把教師與 AI 協同的應用分成四個層次。
+function render(){
+  const s=SLIDES[cur];
+  mainImg.src=imgPath(s.n);
+  titleEl.textContent=s.title;
+  bodyEl.innerHTML=s.paras.map(p=>`<p>${p}</p>`).join('');
+  chip.textContent=`第 ${s.n} / 70 頁`;
+  jumpIn.value=s.n;
+  $('textPane').scrollTop=0;
+  thumbs.forEach((t,i)=>t.classList.toggle('active',i===cur));
+  const at=thumbs[cur];
+  if(at) at.scrollIntoView({inline:'center',block:'nearest'});
+  if(fs.classList.contains('show')){ fsImg.src=imgPath(s.n); fsCount.textContent=`${s.n} / 70`; }
+}
+function go(i){ cur=(i+SLIDES.length)%SLIDES.length; render(); if(narrating) speakCurrent(); }
+function nextS(){ go(cur+1); }
+function prevS(){ go(cur-1); }
 
-最入門的 Level 1，是把現成的 PDF 講義直接交給 AI 一鍵生出題庫；Level 2 是學會提示詞，能按需改造舊題；Level 3 能融入影片與實驗材料進行多模態命題；Level 4 則是善用視覺辨識與 AI 代理人，實現半自動化出卷。今天我們就一關一關地往上走。`
-  },
-  {
-    title: "素養試題的四大靈魂要素",
-    img: "origin_image/slide_05.png",
-    text: `素養導向評量的核心，可以用四個要素概括：情境脈絡、整合運用、能力表現，以及態度與價值。這四者並不是各自獨立的條件，而是相互嵌扣的整體。
-
-其中最容易出問題的，是情境的真實性——如果把題目的情境段落遮住，學生仍然能靠公式做出答案，那這個情境就只是裝飾，稱不上真正的素養題，需要從根本重新設計。`
-  },
-  {
-    title: "國中教育會考：三多一沒有",
-    img: "origin_image/slide_06.png",
-    text: `國中會考在自然科的命題邏輯，可以用「三多一沒有」來掌握：文字多、圖表多、情境多，但沒有複雜的計算。
-
-圖表題在會考自然科佔了七到八成，這個比例很清楚地告訴我們，訓練學生的圖表解讀與變因控制能力，比讓他們背大量細節更為關鍵。我們的命題，也應該往這個方向靠攏。`
-  },
-  {
-    title: "大學學測：學術情境化與混合題型",
-    img: "origin_image/slide_07.png",
-    text: `學測的挑戰在於閱讀量。自然科和國語文的字數每年都在刷新記錄，學生在有限時間內要消化大量的情境文字，本身就是一項能力的測驗。
-
-更值得關注的是混合題組的出現——選擇題與非選擇手寫題共享同一個情境，層層遞進，讓學生無法只靠猜選項過關，必須真正理解情境脈絡才能作答。`
-  },
-  {
-    title: "分科測驗：鷹架式題組與第一性原理",
-    img: "origin_image/slide_08.png",
-    text: `分科測驗則是真正在考科學思辨的素養。它常常引入陌生的學術情境——如 GLP-1 減重藥物的作用機制，或是植物工廠的能量轉換——要求學生回歸第一性原理，用最核心的學科概念去分析一個全新的狀況。
-
-非選題配分大幅增加，答題不是填幾個關鍵字，而是要寫出一條清晰的因果推論鏈。`
-  },
-  {
-    title: "命題計畫：認知層次與難度配置",
-    img: "origin_image/slide_09.png",
-    text: `有了大考格局的認識，我們回到日常命題的規劃。建議以布魯姆認知層次作為標尺，素養題的主力要落在 C3（應用）與 C4（分析）。
-
-這張表格提供的是段考、會考與學測三種情境下，易、中偏易、中偏難、難題的建議比例配置，讓我們每次命題不再憑感覺，而是有據可依。`
-  },
-  {
-    title: "一鍵生成：Kahoot! AI 與 Quizizz AI",
-    img: "origin_image/slide_10.png",
-    text: `如果只有十分鐘，想快速為課堂複習設計一個小測驗，Level 1 工具是最省力的選擇。
-
-Kahoot! AI 可以直接讀取您的講義 PDF，一鍵生成互動遊戲題；Quizizz AI（Wayground）更進一步，支援直接從 YouTube 影片或網頁抓取內容轉成測驗。學生在遊戲情境中練習，課堂氣氛立刻不同，而教師幾乎不需要花額外的時間準備。`
-  },
-  {
-    title: "智慧診斷：Edcafe AI 與個人化學習回饋",
-    img: "origin_image/slide_11.png",
-    text: `Edcafe AI 把學生診斷這件事提升到了新的層次。學生作答之後，系統不只告訴他「答錯了」，而是根據他選擇的那個具體錯誤選項，給出個人化的 AI 診斷回饋——解釋為什麼這樣想是常見的迷思，並引導學生重新思考正確的推理路徑。
-
-這比單純公布標準答案，更能幫助學生真正釐清自己的盲點。`
-  },
-  {
-    title: "如何與 AI 對話？出題提示詞的黃金結構",
-    img: "origin_image/slide_12.png",
-    text: `要讓 AI 出精準的段考題，提示詞的結構是關鍵。我們整理出一套黃金結構：先設定角色（你是一位高中生物教師），接著給予具體任務（依據以下情境出一道閱讀題組），再指定格式（單選五選一，附詳解），最後加上限制條件（難度對應學測程度，情境不可以是裝飾性的）。
-
-把 AI 當成一位剛報到的實習助教，指令越清晰，出來的題目越可用。`
-  },
-  {
-    title: "影音命題：鹽沼天牛生存機制測驗生成",
-    img: "origin_image/slide_13.png",
-    text: `這是一個 Level 3 的實作案例。我們找到一支介紹鹽沼天牛不進食機制的科普 YouTube 影片，讓 AI 擷取逐字稿，再從中提取能量代謝的生物學情境，最後一鍵產出了一組結構完整的閱讀測驗題。
-
-整個過程不超過十五分鐘，而產出的題目情境新穎、知識點扎實，是過去手動出題難以達到的效率。`
-  },
-  {
-    title: "實驗命題：將課本實驗轉為探究題組",
-    img: "origin_image/slide_14.png",
-    text: `實驗課的素材，也可以直接轉化成探究題。只要把課本的實驗步驟——例如有機物檢測或酵素活性的操作流程——丟給 AI，它就能辨識出操縱變因與控制變因，並據此命製考查實驗設計缺陷或數據解讀能力的題目。
-
-這些題目特別接地氣，因為情境就是學生親手做過的實驗，作答起來有真實感，也更能測出理解深度。`
-  },
-  {
-    title: "視覺出題：讓圖表、構造圖自動出題",
-    img: "origin_image/slide_15.png",
-    text: `圖表題和構造圖一直是許多老師命題的難關——找圖、描圖、排版，耗費大量時間。現在使用 Gemini 等具備強大視覺辨識能力的模型，可以直接截圖課本的心臟解剖圖或細胞分裂圖，請 AI 辨識圖中標示的結構並針對各標記出題。
-
-整個出題流程從找素材到產出題目，往往只需要幾分鐘。`
-  },
-  {
-    title: "出題工具箱：各大 AI 模型能力評比",
-    img: "origin_image/slide_16.png",
-    text: `不同的命題需求，其實適合不同的 AI 工具。這張評比矩陣是我們實際測試各大模型後的心得：ChatGPT 在結構化命題上表現穩定；Claude 擅長長文本處理，適合嚴謹的論述性題目；Gemini 的視覺辨識能力最強，是圖表題的首選；Perplexity 和 Felo 則連網能力出色，適合結合時事新知的命題情境。
-
-工具沒有好壞，端看任務需求，選對工具能省下不少來回修改的時間。`
-  },
-  {
-    title: "拒絕瑕疵：如何設計有效的誘答選項",
-    img: "origin_image/slide_17.png",
-    text: `選擇題的品質，往往取決於干擾選項的設計。常見的試題瑕疵有幾種：正確答案明顯比其他選項長、選項中出現「以上皆是」、或是誘答選項根本不像學生會犯的真實錯誤。
-
-我們可以請 AI 針對學生的常見迷思概念設計誘答，讓每個錯誤選項都能對應到一類真實存在的錯誤認知，這樣的選擇題才具備真正的診斷價值。`
-  },
-  {
-    title: "傳統題目改造：菌根題目升級實踐",
-    img: "origin_image/slide_18.png",
-    text: `這頁的改題案例，清楚說明了「升級」的意義。左邊的傳統題，直接問菌根真菌能提供植物哪些功能，學生只要背過就能作答，無需理解；右邊的素養改版，提供一組共生實驗的數據圖表，考查學生從數據中推論出共生效益的能力。
-
-兩道題考查的是同一個知識點，但測到的思維層次完全不同。這個落差，就是素養命題的核心意義所在。`
-  },
-  {
-    title: "題型轉換：將選擇題變為手寫問答題",
-    img: "origin_image/slide_19.png",
-    text: `防止學生靠消去法猜答案，有一個直接的方法：把選擇題改成問答題。去掉選項，要求學生直接描述菌根共生的功能，並限定作答字數與必須出現的關鍵詞。
-
-這個轉換看似簡單，卻能大幅篩選出真正理解的學生，也同時訓練他們把知識組織成清晰因果邏輯的表達能力。`
-  },
-  {
-    title: "階段式 Rubrics 設計",
-    img: "origin_image/slide_20.png",
-    text: `要讓 AI 批改非選題得精準，Rubrics 的設計是前提。我們建議採用階梯式的給分設計，把一道五分題拆成：概念識別（2分）、推論過程（2分）、結論表達（1分）三個層次，每一層都有明確的評分標準。
-
-把這份規準餵給 AI，再搭配學生的作答照片，批改的結果往往精確得讓人驚訝——也讓評分更客觀、更有一致性。`
-  },
-  {
-    title: "手寫考卷批改：AI 視覺評分實務",
-    img: "origin_image/slide_21.png",
-    text: `這是我們在班上實際操作的批改流程。學生手寫完卷子之後，用手機拍照上傳，AI 根據預先設定的 Rubrics 閱卷：它能識別學生的算式與文字，標出扣分的具體位置，並在最後寫一段針對這位學生錯誤的訂正建議。
-
-整體批改時間縮短了將近三分之二，而每位學生得到的回饋，反而比以前更個別化、更具體。`
-  },
-  {
-    title: "國寫作文批改：AI 等級評閱實踐",
-    img: "origin_image/slide_22.png",
-    text: `語文科的作文批改，也已經能用 AI 輔助完成。只要上傳國寫原卷 PDF，AI 能依據大考中心的評分原則，從內容、結構、表達三個維度進行評閱，給出等第（如 A+、A、B），並附上一段具深度的分析與改善建議。
-
-值得注意的是，對照教師批閱的結果，AI 在等第判定上的一致性相當高，也讓我們對這套流程有了更多信心。`
-  },
-  {
-    title: "Gradescope：師生評量的智慧助手",
-    img: "origin_image/slide_23.png",
-    text: `Gradescope 解決的是一個很具體的痛點：全班卷子改法不一致的問題。它能自動把寫相同算式或相似答案的學生歸成同一組，我們只要改一次，那一組全部學生的分數就同步到位。
-
-更方便的是，事後若想調整某道題的給分標準，全班分數會即時自動更新，不需要手動逐份重改。這在學期末統計時，省下了相當可觀的時間。`
-  },
-  {
-    title: "一鍵解析：考卷詳解與概念庫建立",
-    img: "origin_image/slide_24.png",
-    text: `段考考完後最讓老師頭痛的，往往不是改卷，而是打詳解。現在，把考卷與標準答案給 AI，幾秒內就能產出完整的試題解析，還能自動整理出這份考卷考查的核心概念分布，直接轉化成一份「考前重點複習指引」給學生。
-
-這段時間省下來，可以用在更有價值的學習設計工作上。`
-  },
-  {
-    title: "趨勢透視：115學測自然科深度分析",
-    img: "origin_image/slide_25.png",
-    text: `AI 不只能幫我們出題，也能幫我們分析大考趨勢。我們把 115 年的學測自然科試卷完整丟給 AI，請它分析生物、物理、化學、地科四科的命題難度配置，以及各科高頻考點的分布。
-
-這份分析能幫助我們動態調整教學進度，把力氣放在真正值得深耕的概念，而不是把每個單元都塞進課表裡衝刺。`
-  },
-  {
-    title: "NotebookLM：建立班級專屬解題 Bot",
-    img: "origin_image/slide_26.png",
-    text: `大考前學生有問不完的題目，但我們不可能 24 小時待機解答。NotebookLM 提供了一個優雅的解法：把歷屆試題與詳解上傳後，系統會把這些文件鎖定為唯一的知識庫，AI 的回答只從這份材料中生成，不會胡亂發揮。
-
-學生在課後提問，它就像一個永遠在線的解題助教；它甚至能把試卷內容念給學生聽，對聽覺型學習者特別有幫助。`
-  },
-  {
-    title: "客製化 Bot：GPTs 專案與 Gemini Gem 設定",
-    img: "origin_image/slide_27.png",
-    text: `如果希望出題改題的流程更自動化，可以建立一個「常駐型命題機器人」。在 ChatGPT 中建立 GPTs，或在 Google Gemini 中設定 Gem，把自己的課程講義、命題規格和偏好都固定進去。
-
-以後只要把新的素材或情境文字傳給它，它就會自動按照您的命題習慣生成試題，不需要每次重新寫提示詞，大幅降低重複性的備課負擔。`
-  },
-  {
-    title: "AI 代理人：一鍵生成完整試卷與解答",
-    img: "origin_image/slide_28.png",
-    text: `終極的自動化工作流，是 AI 代理人（Agent）的應用。在 Claude Project 中配置好命題工具與知識庫之後，只要下達一個任務指令，AI 會自己去找相關知識點、選取合適題目、分配配分並完成排版，最後直接輸出學生版試卷 PDF 與附有 Rubrics 的教師詳解版。
-
-整個流程如果順暢，可以在幾分鐘內完成一份完整的段考卷。`
-  },
-  {
-    title: "自動化成果：光合作用與呼吸作用考卷",
-    img: "origin_image/slide_29.png",
-    text: `這是 AI Agent 實際自動產出的成果示範。試卷架構包含了單選、多選、閱讀測驗與非選題，格式完全對齊大考中心規格，每道非選題都附有詳細的 Rubrics。
-
-看到這份成果，我們很難不去想像：這代表的是評量設計工作質地的一場改變——繁重的文書工作從此不再是老師時間的主要消耗，老師的心力可以真正投入在教學設計與學生理解上。`
-  },
-  {
-    title: "AI 與教師的協同進化",
-    img: "origin_image/slide_30.png",
-    text: `走到這裡，我想回到一個更根本的問題：我們用 AI 究竟是為了什麼？不是為了偷懶，也不是為了炫技，而是為了把時間還給自己。
-
-把出題排版、初步批改這些可以標準化的工作交給 AI，把省下來的時間留給探究引導、課堂對話與學生關懷。教育的靈魂從來不在那些繁瑣的文書工作裡，而在師生之間真實的連結之中。`
-  },
-  {
-    title: "您的 AI 落地行動方案：從明天開始",
-    img: "origin_image/slide_31.png",
-    text: `研習結束後，最好的下一步不是「回家再想想」，而是給自己設定三個具體的行動節點。
-
-第一週，用 Kahoot! 或 Quizizz 為某堂課設計一個互動小測驗，感受一下工具的手感；第一個月，嘗試建立一個 Gemini Gem，把自己的命題偏好固定下來；本學期末，為您的學生建立一個 NotebookLM 解題助教。這三步，是從旁觀者變成實踐者最短的路徑。`
-  },
-  {
-    title: "用 AI 賦能教學，釋放更多創造力！",
-    img: "origin_image/slide_32.png",
-    text: `今天的分享就到這裡了。我們為大家準備了今天所有使用的提示詞、工具連結與講義資源，歡迎掃描畫面上的 QR Code 下載帶走。
-
-這套工作流不是麗山的專利，而是每一位願意嘗試的老師都可以建立的系統。期待下次聽到大家分享自己在教學現場的 AI 實踐故事。現在進入 Q&A 時間，歡迎各位老師提問。`
+// ---- 旁白朗讀 (Web Speech API) ----
+let narrating=false, zhVoice=null, advanceTimer=null, allVoices=[];
+const synth=window.speechSynthesis;
+// 語音「自然度」評分：線上 Google、加強版、Siri、神經網路語音優先
+function voiceScore(v){
+  const n=(v.name||'')+' '+(v.voiceURI||''); let s=0;
+  if(/zh[-_]TW|zh[-_]Hant|cmn/i.test(v.lang)) s+=40;       // 繁中臺灣優先
+  else if(/^zh|zh[-_]CN|zh[-_]HK/i.test(v.lang)) s+=20;    // 其他中文次之
+  if(/google/i.test(n)) s+=30;                             // Chrome 線上 Google 語音最自然
+  if(/enhanced|premium|加強|進階|neural|natural/i.test(n)) s+=25;
+  if(/siri/i.test(n)) s+=20;
+  if(/美嘉|meijia|台湾|臺灣|taiwan/i.test(n)) s+=10;
+  return s;
+}
+function buildVoiceList(){
+  if(!synth) return;
+  allVoices=synth.getVoices();
+  // 只保留「Google 國語（臺灣）」語音
+  const gtw=allVoices.filter(v=>/google/i.test(v.name) && /zh[-_]TW|zh[-_]Hant|國語|臺灣|台灣/i.test((v.name||'')+' '+v.lang));
+  const sel=$('voiceSel');
+  sel.innerHTML='';
+  if(gtw.length){
+    gtw.forEach(v=>{
+      const o=document.createElement('option');
+      o.value=allVoices.indexOf(v);
+      o.textContent=`${v.name} (${v.lang}) ✨線上`;
+      sel.appendChild(o);
+    });
+    sel.value=allVoices.indexOf(gtw[0]); zhVoice=gtw[0];
+  }else{
+    // 找不到時給提示（多半是沒用 Chrome 或未連網），仍以系統預設繁中發音
+    const o=document.createElement('option');
+    o.value=''; o.textContent='找不到 Google 國語（臺灣）— 請用 Chrome 並連網';
+    sel.appendChild(o); zhVoice=null;
   }
-];
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  STATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-let current = 0;
-let isPlaying = false;
-let autoTimer = null;
-let autoProgress = null;
-let timerElapsed = 0;
-let isFS = false;
-let fsHideTimer = null;
-
-const TOTAL = slides.length;
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  ELEMENTS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-const mainImg = document.getElementById('mainImg');
-const fsImg = document.getElementById('fs-img');
-const textBody = document.getElementById('textBody');
-const slideBadge = document.getElementById('slideBadge');
-const slideTitleText = document.getElementById('slideTitleText');
-const pageIndicator = document.getElementById('pageIndicator');
-const fsPageIndicator = document.getElementById('fsPageIndicator');
-const progressBar = document.getElementById('progressBar');
-const progressBar2 = document.getElementById('progressBar2');
-const fsProgressBar = document.getElementById('fsProgressBar');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const fsPrevBtn = document.getElementById('fsPrevBtn');
-const fsNextBtn = document.getElementById('fsNextBtn');
-const fsPauseBtn = document.getElementById('fsPauseBtn');
-const playBtn = document.getElementById('playBtn');
-const playIcon = document.getElementById('playIcon');
-const playLabel = document.getElementById('playLabel');
-const fsBtn = document.getElementById('fsBtn');
-const fsOverlay = document.getElementById('fs-overlay');
-const fsControls = document.getElementById('fsControls');
-const thumbStrip = document.getElementById('thumbStrip');
-const autoSpeedSelect = document.getElementById('autoSpeedSelect');
-const fsAutoSpeedSelect = document.getElementById('fsAutoSpeedSelect');
-const timerCircle = document.getElementById('timerCircle');
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  THUMBNAILS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-function buildThumbs() {
-  slides.forEach((s, i) => {
-    const img = document.createElement('img');
-    img.src = s.img;
-    img.className = 'thumb' + (i === 0 ? ' active' : '');
-    img.title = `第 ${i+1} 頁：${s.title}`;
-    img.onclick = () => gotoSlide(i);
-    thumbStrip.appendChild(img);
+}
+if(synth){
+  buildVoiceList();
+  synth.onvoiceschanged=buildVoiceList;   // 語音清單常延遲載入，載好再補上
+  $('voiceSel').addEventListener('change',()=>{
+    zhVoice=allVoices[parseInt($('voiceSel').value)]||null;
+    if(narrating) speakCurrent();          // 立即試聽新語音
   });
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  NAVIGATION
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-function gotoSlide(n, skipResetTimer) {
-  if (n < 0 || n >= TOTAL) return;
-
-  // Fade transition
-  mainImg.classList.add('fading');
-  fsImg.classList.add('fading');
-
-  setTimeout(() => {
-    current = n;
-    const s = slides[current];
-
-    mainImg.src = s.img;
-    mainImg.classList.remove('fading');
-
-    fsImg.src = s.img;
-    fsImg.classList.remove('fading');
-
-    // Text panel
-    slideBadge.textContent = `SLIDE ${String(current+1).padStart(2,'0')}`;
-    slideTitleText.textContent = s.title;
-    // Render paragraphs
-    textBody.innerHTML = s.text.trim().split(/\n\n+/).map(p =>
-      `<p>${p.trim().replace(/\n/g,'<br>')}</p>`
-    ).join('');
-
-    // Indicators
-    const pct = ((current+1)/TOTAL*100).toFixed(1) + '%';
-    progressBar.style.width = pct;
-    progressBar2.style.width = pct;
-    fsProgressBar.style.width = pct;
-    pageIndicator.textContent = `${current+1} / ${TOTAL}`;
-    fsPageIndicator.textContent = `${current+1} / ${TOTAL}`;
-
-    // Buttons
-    prevBtn.disabled = current === 0;
-    nextBtn.disabled = current === TOTAL-1;
-    fsPrevBtn.disabled = current === 0;
-    fsNextBtn.disabled = current === TOTAL-1;
-
-    // Thumbnail
-    document.querySelectorAll('.thumb').forEach((t, i) => t.classList.toggle('active', i===current));
-    // Scroll thumb into view
-    const activThumb = thumbStrip.children[current];
-    if (activThumb) activThumb.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-
-    // If playing, reset timer
-    if (isPlaying && !skipResetTimer) resetAutoTimer();
-
-    // If at end and playing, stop
-    if (current === TOTAL-1 && isPlaying) {
-      // let it stay on last slide
+// 將整頁（標題＋各段）切成短句，標題只在最前面唸一次，
+// 短句可避開 Chrome 長語句會從頭重播的已知問題（造成標題重複）。
+function buildChunks(s){
+  const out=[];
+  [s.title, ...s.paras].forEach(t=>{
+    (t||'').split(/(?<=[。！？!?；;：])/).forEach(p=>{ p=p.trim(); if(p) out.push(p); });
+  });
+  return out;
+}
+let speakGen=0;   // 世代編號，讓被取消的舊回呼失效，避免重播/重複
+function speakCurrent(){
+  if(!synth){ alert('您的瀏覽器不支援語音朗讀，請改用 Chrome 或 Edge。'); return; }
+  const gen=++speakGen;
+  synth.cancel(); clearTimeout(advanceTimer);
+  const chunks=buildChunks(SLIDES[cur]);
+  const rate=Math.min(2,Math.max(0.5,parseFloat($('rateIn').value)||0.95));
+  const pitch=Math.min(1.5,Math.max(0.5,parseFloat($('pitchIn').value)||1));
+  let i=0;
+  (function next(){
+    if(gen!==speakGen) return;                 // 已被新的朗讀取代
+    if(i>=chunks.length){                       // 本頁唸完
+      if(narrating && cur<SLIDES.length-1){ advanceTimer=setTimeout(()=>{ if(narrating && gen===speakGen) go(cur+1); },900); }
+      else if(narrating){ stopPlay(); }         // 最後一頁停止
+      return;
     }
-  }, 160);
+    const u=new SpeechSynthesisUtterance(chunks[i]);
+    u.lang='zh-TW'; if(zhVoice) u.voice=zhVoice; u.rate=rate; u.pitch=pitch;
+    u.onend=()=>{ if(gen!==speakGen) return; i++;
+      // 句與句之間留一點自然停頓，聽起來比較像人在說話
+      const gap = /[。！？!?]$/.test(chunks[i-1]) ? 260 : 90;
+      setTimeout(()=>{ if(gen===speakGen) next(); }, gap);
+    };
+    u.onerror=()=>{};                           // 取消時的 error 忽略
+    synth.speak(u);
+  })();
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  AUTO PLAY
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-function getSpeed() {
-  // Use whichever select is active
-  const v = isFS ? parseInt(fsAutoSpeedSelect.value) : parseInt(autoSpeedSelect.value);
-  return isNaN(v) ? 0 : v;
+// ---- 統一播放控制 ----
+// 模式一：勾選「朗讀完才換頁」→ 由旁白驅動，唸完整頁才換頁（不受秒數限制）
+// 模式二：取消勾選 → 依上方秒數固定換頁（無旁白）
+function secs(){ let v=parseInt($('secIn').value)||8; return Math.max(1,v)*1000; }
+function uiReset(){
+  $('autoBtn').classList.remove('on'); $('autoBtn').innerHTML='▶ 自動播放';
+  $('speakBtn').classList.remove('on'); $('speakBtn').innerHTML='🔊 朗讀旁白';
+  $('fsAuto').innerHTML='▶ 自動播放'; $('fsSpeak').innerHTML='🔊 朗讀旁白';
+  badge.classList.remove('show');
 }
-
-function syncSpeeds() {
-  // Keep both selects in sync
-  autoSpeedSelect.value = fsAutoSpeedSelect.value;
-  fsAutoSpeedSelect.value = autoSpeedSelect.value;
+function stopPlay(){                     // 停止所有播放（計時＋旁白）
+  clearInterval(autoTimer); autoTimer=null;
+  narrating=false; if(synth) synth.cancel(); clearTimeout(advanceTimer);
+  uiReset();
 }
-
-autoSpeedSelect.addEventListener('change', () => {
-  fsAutoSpeedSelect.value = autoSpeedSelect.value;
-  if (isPlaying) resetAutoTimer();
-});
-fsAutoSpeedSelect.addEventListener('change', () => {
-  autoSpeedSelect.value = fsAutoSpeedSelect.value;
-  if (isPlaying) resetAutoTimer();
-});
-
-function startAutoPlay() {
-  const speed = getSpeed();
-  if (speed === 0) { stopAutoPlay(); return; }
-  isPlaying = true;
-  updatePlayUI();
-  resetAutoTimer();
+function startTimer(){                   // 秒數驅動（無旁白）
+  stopPlay(); autoTimer=setInterval(nextS,secs());
+  $('autoBtn').classList.add('on'); $('autoBtn').innerHTML='⏸ 停止播放';
+  $('fsAuto').innerHTML='⏸ 停止播放';
+  badge.textContent='自動播放中…'; badge.classList.add('show');
 }
-
-function stopAutoPlay() {
-  isPlaying = false;
-  clearInterval(autoTimer);
-  clearInterval(autoProgress);
-  timerElapsed = 0;
-  timerCircle.style.strokeDashoffset = '88';
-  updatePlayUI();
+function startNarrate(){                 // 旁白驅動：唸完才換頁
+  stopPlay(); narrating=true;
+  $('speakBtn').classList.add('on'); $('speakBtn').innerHTML='⏹ 停止朗讀';
+  $('autoBtn').classList.add('on'); $('autoBtn').innerHTML='⏸ 停止播放';
+  $('fsSpeak').innerHTML='⏹ 停止朗讀'; $('fsAuto').innerHTML='⏸ 停止播放';
+  badge.textContent='旁白朗讀中…'; badge.classList.add('show');
+  speakCurrent();
 }
+function isPlaying(){ return !!autoTimer || narrating; }
+function startPlay(){ $('waitSpeak').checked ? startNarrate() : startTimer(); }
+function togglePlay(){ isPlaying()?stopPlay():startPlay(); }
 
-function resetAutoTimer() {
-  clearInterval(autoTimer);
-  clearInterval(autoProgress);
-  timerElapsed = 0;
+$('autoBtn').onclick=togglePlay;
+$('fsAuto').onclick=togglePlay;
+$('speakBtn').onclick=()=>{ narrating?stopPlay():startNarrate(); };
+$('fsSpeak').onclick=()=>{ narrating?stopPlay():startNarrate(); };
+// 調整語速或音調時，若正在朗讀則即時套用到本頁
+$('rateIn').addEventListener('change',()=>{ if(narrating) speakCurrent(); });
+$('pitchIn').addEventListener('change',()=>{ if(narrating) speakCurrent(); });
 
-  const speed = getSpeed();
-  if (speed === 0) { stopAutoPlay(); return; }
+$('next').onclick=nextS; $('prev').onclick=prevS;
+$('fsNext').onclick=nextS; $('fsPrev').onclick=prevS;
 
-  const circumference = 88;
-  timerCircle.style.strokeDashoffset = String(circumference);
-
-  // Progress ring update every 100ms
-  autoProgress = setInterval(() => {
-    timerElapsed += 0.1;
-    const fraction = timerElapsed / speed;
-    const offset = circumference * (1 - fraction);
-    timerCircle.style.strokeDashoffset = String(Math.max(0, offset));
-  }, 100);
-
-  autoTimer = setInterval(() => {
-    if (current < TOTAL-1) {
-      gotoSlide(current+1, true);
-      timerElapsed = 0;
-      clearInterval(autoProgress);
-      const progressRefresh = setInterval(() => {
-        timerElapsed += 0.1;
-        const fraction = timerElapsed / speed;
-        const offset = circumference * (1 - fraction);
-        timerCircle.style.strokeDashoffset = String(Math.max(0, offset));
-        if (timerElapsed >= speed) clearInterval(progressRefresh);
-      }, 100);
-      autoProgress = progressRefresh;
-    } else {
-      // Loop back or stop
-      stopAutoPlay();
-    }
-  }, speed * 1000);
-}
-
-function togglePlay() {
-  if (isPlaying) {
-    stopAutoPlay();
-  } else {
-    const speed = getSpeed();
-    if (speed === 0) {
-      // Default to 6s if "off"
-      autoSpeedSelect.value = '6';
-      fsAutoSpeedSelect.value = '6';
-    }
-    startAutoPlay();
-  }
-}
-
-function updatePlayUI() {
-  if (isPlaying) {
-    playIcon.textContent = '⏸';
-    playLabel.textContent = '暫停';
-    fsPauseBtn.textContent = '⏸';
-    playBtn.innerHTML = '<span class="auto-indicator"></span><span>暫停</span>';
-  } else {
-    playIcon.textContent = '▶';
-    playLabel.textContent = '播放';
-    fsPauseBtn.textContent = '▶';
-    playBtn.innerHTML = '▶ 播放';
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  FULLSCREEN
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-function enterFullscreen() {
-  isFS = true;
-  fsOverlay.classList.add('active');
-  fsBtn.classList.add('active');
-  fsBtn.textContent = '⛶ 返回';
-  gotoSlide(current, true);
-  // Also request browser fullscreen
-  if (fsOverlay.requestFullscreen) fsOverlay.requestFullscreen().catch(()=>{});
-  setupFsMouseHide();
-}
-
-function exitFullscreen() {
-  isFS = false;
-  fsOverlay.classList.remove('active');
-  fsBtn.classList.remove('active');
-  fsBtn.textContent = '⛶ 全螢幕';
-  fsControls.classList.remove('hidden');
-  clearTimeout(fsHideTimer);
-  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-}
-
-function setupFsMouseHide() {
-  const overlay = document.getElementById('fs-overlay');
-  overlay.addEventListener('mousemove', showFsControls);
-}
-
-function showFsControls() {
-  fsControls.classList.remove('hidden');
-  clearTimeout(fsHideTimer);
-  fsHideTimer = setTimeout(() => {
-    fsControls.classList.add('hidden');
-  }, 3000);
-}
-
-document.addEventListener('fullscreenchange', () => {
-  if (!document.fullscreenElement && isFS) exitFullscreen();
+jumpIn.addEventListener('change',()=>{
+  let v=parseInt(jumpIn.value)||1; v=Math.max(1,Math.min(70,v)); go(v-1);
 });
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  KEYBOARD
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
-    e.preventDefault();
-    gotoSlide(current+1);
-  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-    e.preventDefault();
-    gotoSlide(current-1);
-  } else if (e.key === 'Escape' && isFS) {
-    exitFullscreen();
-  } else if (e.key === 'f' || e.key === 'F') {
-    isFS ? exitFullscreen() : enterFullscreen();
-  } else if (e.key === 'p' || e.key === 'P') {
-    togglePlay();
-  }
+// ---- fullscreen ----
+function openFS(){
+  fs.classList.add('show'); render();
+  if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+}
+function closeFS(){
+  fs.classList.remove('show');
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+}
+$('fsBtn').onclick=openFS; $('fsExit').onclick=closeFS;
+document.addEventListener('fullscreenchange',()=>{ if(!document.fullscreenElement && fs.classList.contains('show')) closeFS(); });
+
+// ---- theme ----
+$('themeBtn').onclick=()=>{
+  const h=document.documentElement, b=document.body;
+  const dark=b.getAttribute('data-theme')!=='dark';
+  b.setAttribute('data-theme',dark?'dark':'light');
+  h.setAttribute('data-theme',dark?'dark':'light');
+  $('themeBtn').innerHTML=dark?'☀️ 淺色':'🌙 深色';
+};
+// sync html attr initially
+document.documentElement.setAttribute('data-theme','light');
+
+// ---- keyboard ----
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='PageDown'){ nextS(); }
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){ prevS(); }
+  else if(e.key==='Escape'){ if(fs.classList.contains('show')) closeFS(); }
+  else if(e.key==='f'||e.key==='F'){ fs.classList.contains('show')?closeFS():openFS(); }
 });
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  THEME TOGGLE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-let isLight = false;
-function toggleTheme() {
-  isLight = !isLight;
-  document.body.classList.toggle('light', isLight);
-  const icon = document.getElementById('themeIcon');
-  const label = document.getElementById('themeLabel');
-  if (isLight) {
-    icon.textContent = '🌙';
-    label.textContent = '黑底';
-  } else {
-    icon.textContent = '☀️';
-    label.textContent = '白底';
-  }
+// ---- swipe (touch) on slide & fullscreen ----
+function addSwipe(el){
+  let x0=null;
+  el.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; },{passive:true});
+  el.addEventListener('touchend',e=>{
+    if(x0===null)return; const dx=e.changedTouches[0].clientX-x0;
+    if(Math.abs(dx)>45){ dx<0?nextS():prevS(); } x0=null;
+  },{passive:true});
 }
+addSwipe(document.querySelector('.slide-pane'));
+addSwipe(fs);
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-//  INIT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━
-buildThumbs();
-gotoSlide(0, true);
+// mouse wheel on filmstrip -> horizontal scroll
+strip.addEventListener('wheel',e=>{ if(e.deltaY){ strip.scrollLeft+=e.deltaY; e.preventDefault(); } },{passive:false});
+
+// 離開頁面時停止語音
+window.addEventListener('beforeunload',()=>{ if(synth) synth.cancel(); });
+
+render();
 </script>
 </body>
 </html>
